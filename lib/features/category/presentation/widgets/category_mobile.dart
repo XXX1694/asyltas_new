@@ -10,11 +10,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
 
+@Deprecated('Use CatalogCategoryLayout instead')
 class CategoryMobileList extends StatefulWidget {
   const CategoryMobileList({
     super.key,
     required this.categoryId,
   });
+
   final String categoryId;
 
   @override

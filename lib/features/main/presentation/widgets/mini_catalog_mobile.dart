@@ -12,10 +12,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
 
+@Deprecated('Use CatalogLayout instead')
 class MiniCatalogMobile extends StatefulWidget {
   const MiniCatalogMobile({
     super.key,
   });
+
   @override
   State<MiniCatalogMobile> createState() => _MiniCatalogMobileState();
 }
@@ -75,6 +77,7 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
   int selescted = 0;
   List products = [];
   List<ProductModel> categoryProducts = [];
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -126,10 +129,10 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
           stream: FirebaseFirestore.instance.collection('products').snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const MiniCatalogPlacegolder();
+              return const MiniCatalogShimmer();
             }
             if (snapshot.hasError) {
-              return const MiniCatalogPlacegolder();
+              return const MiniCatalogShimmer();
             }
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
               return const Center(child: Text('No products available.'));
