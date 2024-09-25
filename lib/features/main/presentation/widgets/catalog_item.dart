@@ -38,7 +38,7 @@ class CatalogItem extends StatelessWidget {
           child: Stack(
             children: [
               AspectRatio(
-                aspectRatio: 1 / 1,
+                aspectRatio: 1.2,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Container(
@@ -88,6 +88,7 @@ class CatalogItem extends StatelessWidget {
                         child: Center(
                           child: Text(
                             "${item.numberLeft ?? 0} шт",
+                            maxLines: 1,
                             style: const TextStyle(
                               color: newBlack,
                               fontFamily: 'Gilroy',
@@ -110,6 +111,7 @@ class CatalogItem extends StatelessWidget {
           children: [
             Text(
               item.name ?? '',
+              maxLines: 1,
               style: const TextStyle(
                 fontFamily: 'Gilroy',
                 color: newBlack,

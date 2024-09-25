@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-
 import '../../../../core/constants.dart';
 import '../bloc/catalog_bloc.dart';
 import 'catalog_item.dart';
 import 'mini_catalog_placegolder.dart';
 
 class CatalogScreen extends StatefulWidget {
-  const CatalogScreen({super.key});
+  const CatalogScreen({
+    super.key,
+    required this.currentCategoryId,
+  });
+
+  final String currentCategoryId;
 
   @override
   State<CatalogScreen> createState() => _CatalogScreenState();
@@ -16,24 +19,82 @@ class CatalogScreen extends StatefulWidget {
 
 class _CatalogScreenState extends State<CatalogScreen>
     with SingleTickerProviderStateMixin {
+  late ScrollController _scrollController;
+  late final String currentCategoryId = widget.currentCategoryId;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+    context.read<CatalogBloc>().add(LoadCatalog(categoryId: currentCategoryId));
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isBottom) {
+      final catalogBloc = context.read<CatalogBloc>();
+      final state = catalogBloc.state;
+      if (state is CatalogLoaded && !state.hasNext) {
+        catalogBloc.add(LoadCatalog(
+          categoryId: currentCategoryId,
+          isInitialLoad: false,
+        ));
+      }
+    }
+  }
+
+  bool get _isBottom {
+    if (!_scrollController.hasClients) return false;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    return currentScroll >= (maxScroll * 0.9);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CatalogBloc, CatalogState>(
       builder: (BuildContext context, CatalogState state) {
         if (state is CatalogLoaded) {
           final products = state.products;
-          return StaggeredGrid.count(
-            mainAxisSpacing: 16,
-            crossAxisCount: 2,
-            crossAxisSpacing: 12,
-            children: products
-                .map((product) => CatalogItem(
-              item: product,
-              showCustomSnackBar: showCustomSnackBar,
-            ))
-                .toList(),
-          );
-        }
+          if(products.isEmpty){
+            return const Center(
+              child: Text('Нет товаров в данной категории'),
+            );
+          }
+
+
+          return LimitedBox(
+            maxHeight: MediaQuery.of(context).size.height ,
+            child: GridView.builder(
+              controller: _scrollController,
+              padding: const EdgeInsets.all(0),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 12,
+                childAspectRatio: 0.7,
+              ),
+              itemCount:
+              state.hasNext ? products.length : products.length + 1,
+              itemBuilder: (context, index) {
+                if (index < products.length) {
+                  final product = products[index];
+                  return CatalogItem(
+                    item: product,
+                    showCustomSnackBar: showCustomSnackBar,
+                  );
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
+          );        }
         if (state is CatalogError) {
           return Center(
             child: Text(state.message),

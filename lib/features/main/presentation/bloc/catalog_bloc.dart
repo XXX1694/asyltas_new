@@ -16,45 +16,85 @@ class CatalogBloc extends Bloc<CatalogEvent, CatalogState> {
     on<LoadCatalog>(_onLoadProducts);
   }
 
-  Future _querySnapshotByCategoryId(String categoryId) {
-    return FirebaseFirestore.instance
+  DocumentSnapshot? lastDocument;
+  bool isFetching = false;
+
+  Future<QuerySnapshot> _querySnapshotByCategoryId(String categoryId,
+      {int limit = 20}) {
+    Query query = FirebaseFirestore.instance
         .collection(FirebaseDataKeys.products)
         .where(FirebaseDataKeys.categoryId, isEqualTo: categoryId)
-        .get();
+        .limit(limit);
+
+    final lastDocument = this.lastDocument;
+
+    if (lastDocument != null) {
+      query = query.startAfterDocument(lastDocument);
+    }
+
+    return query.get();
   }
 
-  Future _querySnapshotAllCatalog() {
-    return FirebaseFirestore.instance
+  Future<QuerySnapshot> _querySnapshotAllCatalog({int limit = 20}) {
+    Query query = FirebaseFirestore.instance
         .collection(FirebaseDataKeys.products)
-        .limit(100)
-        .get();
+        .limit(limit);
+
+    final lastDocument = this.lastDocument;
+
+    if (lastDocument != null) {
+      query = query.startAfterDocument(lastDocument);
+    }
+
+    return query.get();
   }
 
   Future<void> _onLoadProducts(
     LoadCatalog event,
     Emitter<CatalogState> emit,
   ) async {
-    emit(const CatalogLoading());
+    if (isFetching) return;
+    isFetching = true;
+
     try {
+      if (event.isInitialLoad) {
+        emit(const CatalogLoading());
+        lastDocument = null;
+      }
+
       final isAll = event.categoryId == categoryProducts.first.id;
 
       final querySnapshot = isAll
           ? await _querySnapshotAllCatalog()
           : await _querySnapshotByCategoryId(event.categoryId);
 
-      final List<ProductModel> products =
-          querySnapshot.docs.map<ProductModel>((doc) {
+      final fetchedProducts = querySnapshot.docs.map<ProductModel>((doc) {
         final data =
             Map<String, dynamic>.from(doc.data() as Map<String, dynamic>);
         data[FirebaseDataKeys.id] = doc.id;
         final product = ProductModel.fromJson(data);
-
         return product;
       }).toList();
-      emit(CatalogLoaded(products: products));
+
+      bool hasNext = fetchedProducts.length < 20;
+
+      lastDocument = querySnapshot.docs.isNotEmpty
+          ? querySnapshot.docs.last
+          : lastDocument;
+
+      if (state is CatalogLoaded && !event.isInitialLoad) {
+        final currentState = state as CatalogLoaded;
+        final allProducts = List<ProductModel>.from(currentState.products)
+          ..addAll(fetchedProducts);
+        emit(CatalogLoaded(products: allProducts, hasNext: hasNext));
+      } else {
+        emit(CatalogLoaded(products: fetchedProducts, hasNext: hasNext));
+      }
     } catch (error, stackTrace) {
       log('CatalogBloc: _onLoadProducts', error: error, stackTrace: stackTrace);
       emit(CatalogError(message: 'Ошибка при загрузке продуктов: $error'));
+    } finally {
+      isFetching = false;
     }
   }
 }

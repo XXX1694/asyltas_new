@@ -16,9 +16,13 @@ class CatalogLoading extends CatalogState {
 }
 
 class CatalogLoaded extends CatalogState {
-  const CatalogLoaded({required this.products});
+  const CatalogLoaded({
+    required this.products,
+    this.hasNext = false,
+  });
 
   final List<ProductModel> products;
+  final bool hasNext;
 
   @override
   List<Object> get props => [products];

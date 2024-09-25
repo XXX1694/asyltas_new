@@ -12,8 +12,8 @@ import 'categories_panel.dart';
 
 class CatalogLayout extends StatefulWidget {
   const CatalogLayout({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<CatalogLayout> createState() => _CatalogLayoutState();
@@ -28,11 +28,15 @@ class _CatalogLayoutState extends State<CatalogLayout> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      productBloc.add(LoadCatalog(categoryId: categoryProducts.first.id));
+      productBloc.add(LoadCatalog(
+          categoryId: categoryProducts.first.id, isInitialLoad: true));
     });
 
     controller.addListener(() {
-      productBloc.add(LoadCatalog(categoryId: controller.value.id));
+      productBloc.add(LoadCatalog(
+        categoryId: controller.value.id,
+        isInitialLoad: true,
+      ));
     });
   }
 
@@ -47,7 +51,7 @@ class _CatalogLayoutState extends State<CatalogLayout> {
         children: [
           CategoriesPanel(controller: controller),
           const SizedBox(height: 20),
-          const CatalogScreen(),
+          CatalogScreen(currentCategoryId: controller.value.id),
           const SizedBox(height: 16),
           CupertinoButton(
             padding: const EdgeInsets.all(0),

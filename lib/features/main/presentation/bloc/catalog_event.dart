@@ -8,10 +8,14 @@ abstract class CatalogEvent extends Equatable {
 }
 
 class LoadCatalog extends CatalogEvent {
-  const LoadCatalog({required this.categoryId});
+  const LoadCatalog({
+    required this.categoryId,
+    this.isInitialLoad = true,
+  });
 
   final String categoryId;
+  final bool isInitialLoad;
 
   @override
-  List<Object> get props => [categoryId];
+  List<Object> get props => [categoryId, isInitialLoad];
 }
