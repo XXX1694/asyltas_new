@@ -12,20 +12,20 @@ class CartProvider with ChangeNotifier {
     _loadCart();
   }
 
+  // Метод для добавления товара в корзину
   bool addItem(ProductModel product) {
-    // Check if the item already exists in the cart
     final existingProductIndex = _items.indexWhere(
       (item) => item.id == product.id,
     );
 
     if (existingProductIndex == -1) {
-      // If the product does not exist in the cart, add it
+      // Если товара нет в корзине, добавляем его
       _items.add(product);
       _saveCart();
       notifyListeners();
       return true;
     } else {
-      // If the product already exists, update its count
+      // Если товар уже есть, обновляем его количество
       _items[existingProductIndex].count =
           (_items[existingProductIndex].count ?? 1) + (product.count ?? 1);
       _saveCart();
@@ -34,63 +34,87 @@ class CartProvider with ChangeNotifier {
     }
   }
 
+  ProductModel? firstWhereOrNull(bool Function(ProductModel item) test) {
+    for (var item in _items) {
+      if (test(item)) return item;
+    }
+    return null;
+  }
+
+  // Метод для удаления товара из корзины
   void removeItem(ProductModel product) {
     _items.removeWhere((item) => item.id == product.id);
     _saveCart();
     notifyListeners();
   }
 
+  // Метод для очистки корзины
   void clearCart() {
     _items.clear();
     _saveCart();
     notifyListeners();
   }
 
+  // Метод для увеличения количества товара
   void incrementCount(ProductModel product) {
-    final existingProduct = _items.firstWhere(
+    final existingProductIndex = _items.indexWhere(
       (item) => item.id == product.id,
-      orElse: () => ProductModel(
-        product.id,
-        product.name,
-        product.images,
-        product.category_id,
-        product.category_name,
-        product.description,
-        product.numberLeft,
-        product.price,
-        1, // Default count to 1 if creating a new item
-      ),
     );
 
-    if (existingProduct.id != null) {
-      existingProduct.count = (existingProduct.count ?? 1) + 1;
+    if (existingProductIndex != -1) {
+      // Увеличиваем количество существующего товара
+      _items[existingProductIndex].count =
+          (_items[existingProductIndex].count ?? 1) + 1;
+      _saveCart();
+      notifyListeners();
+    } else {
+      // Если товара нет, добавляем его с количеством 1
+      product.count = 1;
+      _items.add(product);
       _saveCart();
       notifyListeners();
     }
   }
 
+  // Метод для уменьшения количества товара
   void decrementCount(ProductModel product) {
-    final existingProduct = _items.firstWhere(
+    final existingProductIndex = _items.indexWhere(
       (item) => item.id == product.id,
-      orElse: () => ProductModel(
-        product.id,
-        product.name,
-        product.images,
-        product.category_id,
-        product.category_name,
-        product.description,
-        product.numberLeft,
-        product.price,
-        1, // Default count to 1 if creating a new item
-      ),
     );
 
-    if (existingProduct.id != null) {
-      if ((existingProduct.count ?? 1) > 1) {
-        existingProduct.count = (existingProduct.count ?? 1) - 1;
+    if (existingProductIndex != -1) {
+      int currentCount = _items[existingProductIndex].count ?? 1;
+      if (currentCount > 1) {
+        // Уменьшаем количество товара
+        _items[existingProductIndex].count = currentCount - 1;
       } else {
-        _items.removeWhere((item) => item.id == product.id);
+        // Если количество становится 0, удаляем товар из корзины
+        _items.removeAt(existingProductIndex);
       }
+      _saveCart();
+      notifyListeners();
+    }
+  }
+
+  // Метод для обновления количества товара
+  void updateItem(ProductModel product) {
+    final existingProductIndex = _items.indexWhere(
+      (item) => item.id == product.id,
+    );
+
+    if (existingProductIndex != -1) {
+      if (product.count != null && product.count! > 0) {
+        // Обновляем количество товара
+        _items[existingProductIndex].count = product.count;
+      } else {
+        // Если количество 0 или меньше, удаляем товар из корзины
+        _items.removeAt(existingProductIndex);
+      }
+      _saveCart();
+      notifyListeners();
+    } else if (product.count != null && product.count! > 0) {
+      // Если товара нет в корзине и количество положительное, добавляем его
+      _items.add(product);
       _saveCart();
       notifyListeners();
     }
@@ -99,8 +123,19 @@ class CartProvider with ChangeNotifier {
   int get totalItems => _items.length;
 
   int get totalPrice {
-    return _items.fold(
-        0, (sum, item) => sum + (item.price ?? 0) * (item.count ?? 1));
+    return _items.fold(0, (sum, item) {
+      int count = item.count ?? 1;
+      num price = item.price ?? 0;
+
+      // Применение скидок в зависимости от количества
+      if (count >= 20) {
+        price *= 0.8; // Скидка 20%
+      } else if (count >= 10) {
+        price *= 0.9; // Скидка 10%
+      }
+
+      return sum + (price * count).toInt();
+    });
   }
 
   Future<void> _loadCart() async {

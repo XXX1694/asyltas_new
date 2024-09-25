@@ -14,9 +14,8 @@ import 'package:provider/provider.dart';
 
 class MiniCatalogMobile extends StatefulWidget {
   const MiniCatalogMobile({
-    Key? key,
-  }) : super(key: key);
-
+    super.key,
+  });
   @override
   State<MiniCatalogMobile> createState() => _MiniCatalogMobileState();
 }
@@ -37,17 +36,16 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
     {'id': '0011', 'name': "Шашбау"},
     {'id': '0014', 'name': "Страз на листь"},
   ];
-
-  Map<String, String> selected = {'id': '0000', 'name': 'Все'};
+  Map<String, String> selescted = {'id': '0000', 'name': 'Все'};
   List products = [];
   List<ProductModel> categoryProducts = [];
-
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Заголовок и кнопка "Посмотреть всё"
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Row(
@@ -86,7 +84,6 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
           ),
         ),
         const SizedBox(height: 8),
-        // Слушатель изменений в Firestore
         StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance.collection('products').snapshots(),
           builder: (context, snapshot) {
@@ -97,12 +94,12 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
               return const MiniCatalogPlacegolder();
             }
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return const Center(child: Text('Нет доступных товаров.'));
+              return const Center(child: Text('No products available.'));
             }
             products = snapshot.data!.docs;
             categoryProducts = [];
-            if (selected['id'] == '0000') {
-              for (int i = 0; i < 14 && i < products.length; i++) {
+            if (selescted['id'] == '0000') {
+              for (int i = 0; i < 14; i++) {
                 final product = products[i].data() as Map<String, dynamic>;
                 categoryProducts.add(ProductModel.fromJson(product));
                 categoryProducts.last.id = snapshot.data!.docs[i].id;
@@ -114,12 +111,12 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                 String productCategoryId =
                     (product['category_id'] ?? '').toString();
 
-                if (productCategoryId == selected['id']) {
+                if (productCategoryId == selescted['id']) {
                   tempCategoryProducts.add(ProductModel.fromJson(product));
                   tempCategoryProducts.last.id = snapshot.data!.docs[i].id;
                 }
               }
-              for (int i = 0; i < 14 && i < tempCategoryProducts.length; i++) {
+              for (int i = 0; i < 14; i++) {
                 categoryProducts.add(tempCategoryProducts[i]);
               }
             }
@@ -129,15 +126,14 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                   void Function(void Function()) setStatee) {
                 return Column(
                   children: [
-                    // Отображение категорий
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),
                       child: Wrap(
                         alignment: WrapAlignment.center,
-                        spacing: 8.0,
-                        runSpacing: 8.0,
+                        spacing: 8.0, // Horizontal spacing between containers
+                        runSpacing: 8.0, // Vertical spacing between runs
                         children: category.map((item) {
-                          if (selected['id'] == item['id']) {
+                          if (selescted['id'] == item['id']) {
                             return Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 12,
@@ -162,13 +158,11 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                               opacity: 0.54,
                               child: GestureDetector(
                                 onTap: () {
-                                  selected = item;
+                                  selescted = item;
                                   categoryProducts = [];
 
-                                  if (selected['id'] == '0000') {
-                                    for (int i = 0;
-                                        i < 14 && i < products.length;
-                                        i++) {
+                                  if (selescted['id'] == '0000') {
+                                    for (int i = 0; i < 14; i++) {
                                       final product = products[i].data()
                                           as Map<String, dynamic>;
                                       categoryProducts
@@ -186,17 +180,15 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                                           (product['category_id'] ?? '')
                                               .toString();
 
-                                      if (productCategoryId == selected['id']) {
+                                      if (productCategoryId ==
+                                          selescted['id']) {
                                         tempCategoryProducts.add(
                                             ProductModel.fromJson(product));
                                         tempCategoryProducts.last.id =
                                             snapshot.data!.docs[i].id;
                                       }
                                     }
-                                    for (int i = 0;
-                                        i < 14 &&
-                                            i < tempCategoryProducts.length;
-                                        i++) {
+                                    for (int i = 0; i < 14; i++) {
                                       categoryProducts
                                           .add(tempCategoryProducts[i]);
                                     }
@@ -232,7 +224,6 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // Отображение товаров
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: StaggeredGrid.count(
@@ -240,14 +231,6 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                         crossAxisCount: 2,
                         crossAxisSpacing: 12,
                         children: categoryProducts.map((item) {
-                          // Проверяем, есть ли товар в корзине
-                          final cartItem =
-                              context.watch<CartProvider>().firstWhereOrNull(
-                                    (cartItem) => cartItem.id == item.id,
-                                  );
-
-                          int currentCount = cartItem?.count ?? 0;
-
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
@@ -351,6 +334,7 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                                       fontWeight: FontWeight.w600,
                                     ),
                                     textAlign: TextAlign.center,
+                                    // overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
@@ -363,70 +347,86 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                                     ),
                                   ),
                                   const SizedBox(height: 4),
-                                  // Счетчик с кнопками "+" и "-"
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      // Кнопка "-"
-                                      CupertinoButton(
-                                        padding: EdgeInsets.zero,
-                                        onPressed: currentCount > 0
-                                            ? () {
-                                                context
-                                                    .read<CartProvider>()
-                                                    .decrementCount(item);
-                                                if (currentCount - 1 == 0) {
-                                                  showCustomSnackBar(context,
-                                                      'Удалено из корзины!');
-                                                } else {
-                                                  showCustomSnackBar(context,
-                                                      'Количество уменьшено: ${currentCount - 1}');
-                                                }
-                                              }
-                                            : null,
-                                        child: Icon(
-                                          Icons.remove,
-                                          color: currentCount > 0
-                                              ? newBlack
-                                              : Colors.grey,
+                                  CupertinoButton(
+                                    padding: const EdgeInsets.all(0),
+                                    onPressed: () async {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ProductPage(
+                                            product: item,
+                                          ),
                                         ),
+                                      );
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: secondMain,
+                                        borderRadius: BorderRadius.circular(8),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            offset: const Offset(5, 5),
+                                            blurRadius: 15,
+                                            color:
+                                                Colors.black.withOpacity(0.1),
+                                          ),
+                                        ],
                                       ),
-                                      // Отображение текущего количества
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 12),
+                                      height: 32,
+                                      width: double.infinity,
+                                      child: const Center(
                                         child: Text(
-                                          '$currentCount',
-                                          style: const TextStyle(
+                                          'Подробнее',
+                                          style: TextStyle(
                                             fontFamily: 'Gilroy',
-                                            color: newBlack,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w600,
+                                            color: newWhite,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w400,
+                                            letterSpacing: 0,
                                           ),
                                         ),
                                       ),
-                                      // Кнопка "+"
-                                      CupertinoButton(
-                                        padding: EdgeInsets.zero,
-                                        onPressed: () {
-                                          context
-                                              .read<CartProvider>()
-                                              .incrementCount(item);
-                                          if (currentCount + 1 == 1) {
-                                            showCustomSnackBar(
-                                                context, 'Добавлен в корзину!');
-                                          } else {
-                                            showCustomSnackBar(context,
-                                                'Количество увеличено: ${currentCount + 1}');
-                                          }
-                                        },
-                                        child: const Icon(
-                                          Icons.add,
+                                    ),
+                                  ),
+                                  CupertinoButton(
+                                    padding: const EdgeInsets.all(0),
+                                    onPressed: () {
+                                      item.count = 1;
+                                      bool res =
+                                          context.read<CartProvider>().addItem(
+                                                item,
+                                              );
+                                      if (res) {
+                                        showCustomSnackBar(
+                                            context, 'Добавлен в корзину!');
+                                      } else {
+                                        showCustomSnackBar(context, '+1');
+                                      }
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(
                                           color: newBlack,
+                                          width: 1,
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                      height: 32,
+                                      width: double.infinity,
+                                      child: const Center(
+                                        child: Text(
+                                          'В корзину',
+                                          style: TextStyle(
+                                            fontFamily: 'Gilroy',
+                                            color: newBlack,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w400,
+                                            letterSpacing: 0,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
                                 ],
                               ),
                             ],
@@ -435,7 +435,6 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // Кнопка "Все товары"
                     CupertinoButton(
                       padding: const EdgeInsets.all(0),
                       child: Container(
@@ -462,7 +461,7 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                         ),
                       ),
                       onPressed: () async {
-                        if (selected['id'] == '0000') {
+                        if (selescted['id'] == '0000') {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -474,8 +473,8 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                             context,
                             MaterialPageRoute(
                               builder: (context) => CategoryPgae(
-                                categoryId: selected['id'].toString(),
-                                categoryName: selected['name'].toString(),
+                                categoryId: selescted['id'].toString(),
+                                categoryName: selescted['name'].toString(),
                               ),
                             ),
                           );
@@ -495,24 +494,12 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
 
   void showCustomSnackBar(BuildContext context, String message) {
     final overlay = Overlay.of(context);
-    final animationController = AnimationController(
-      duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
-    final animation = Tween<Offset>(
-      begin: const Offset(1.0, 0.0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: animationController,
-      curve: Curves.easeOut,
-    ));
-
     final overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
         right: 0,
         bottom: MediaQuery.of(context).size.height * 0.12,
         child: SlideTransition(
-          position: animation,
+          position: _slideAnimation(),
           child: Material(
             color: Colors.transparent,
             child: Container(
@@ -538,13 +525,26 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
     );
 
     overlay.insert(overlayEntry);
-    animationController.forward();
 
     Future.delayed(const Duration(milliseconds: 1000), () {
-      animationController.reverse().then((value) {
-        overlayEntry.remove();
-        animationController.dispose();
-      });
+      overlayEntry.remove();
     });
+  }
+
+  Animation<Offset> _slideAnimation() {
+    final animationController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+    final animation = Tween<Offset>(
+      begin: const Offset(1.0, 0.0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: animationController,
+      curve: Curves.easeOut,
+    ));
+
+    animationController.forward();
+    return animation;
   }
 }

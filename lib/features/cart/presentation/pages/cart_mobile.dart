@@ -287,7 +287,7 @@ class _CartMobileState extends State<CartMobile> with TickerProviderStateMixin {
                                           ),
                                           const SizedBox(height: 8),
                                           Text(
-                                            'Неизвестно / Неизвестно',
+                                            'Цена за единицу: ${cart.items[index].price} ₸',
                                             style: TextStyle(
                                               fontFamily: 'Gilroy',
                                               color: newBlack54,
@@ -297,14 +297,36 @@ class _CartMobileState extends State<CartMobile> with TickerProviderStateMixin {
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           const SizedBox(height: 16),
-                                          Text(
-                                            '${cart.items[index].price} ₸',
-                                            style: const TextStyle(
-                                              fontFamily: 'Gilroy',
-                                              color: newMainColor,
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                '${cart.items[index].price! * cart.items[index].count!} ₸ ',
+                                                style: TextStyle(
+                                                  fontFamily: 'Gilroy',
+                                                  color: newBlack,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500,
+                                                  decoration: cart.items[index]
+                                                              .count! >=
+                                                          10
+                                                      ? TextDecoration
+                                                          .lineThrough
+                                                      : null,
+                                                ),
+                                              ),
+                                              cart.items[index].count! >= 10
+                                                  ? Text(
+                                                      '(${(cart.items[index].price! * (cart.items[index].count! >= 20 ? 0.8 : cart.items[index].count! >= 10 ? 0.9 : 1.0)) * cart.items[index].count!} ₸)',
+                                                      style: const TextStyle(
+                                                        fontFamily: 'Gilroy',
+                                                        color: newMainColor,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    )
+                                                  : const SizedBox(),
+                                            ],
                                           ),
                                           const Spacer(),
                                           Row(

@@ -4,6 +4,7 @@ import 'package:asyltas_app/features/favorites/presentation/pages/favorites_page
 import 'package:asyltas_app/features/main/presentation/widgets/corusel.dart';
 import 'package:asyltas_app/features/main/presentation/widgets/home_bottom.dart';
 import 'package:asyltas_app/features/main/presentation/widgets/mini_catalog_mobile.dart';
+import 'package:asyltas_app/features/main/presentation/widgets/shop_widget.dart';
 import 'package:asyltas_app/features/menu/presentation/pages/menu_page.dart';
 import 'package:asyltas_app/provider/cart_provider.dart';
 import 'package:asyltas_app/provider/favorites_provider.dart';
@@ -125,7 +126,9 @@ class HomeMobile extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   const CustomCarousel(),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
+                  const ShopWidget(),
+                  const SizedBox(height: 16),
                   const MiniCatalogMobile(),
                   const SizedBox(height: 16),
                   const HomeBottom(),

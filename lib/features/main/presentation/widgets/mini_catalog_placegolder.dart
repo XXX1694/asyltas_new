@@ -3,45 +3,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
-List<Map<String, String>> category = [
-  {
-    'id': '0000',
-    'name': 'Все',
-  },
-  {
-    'id': '0001',
-    'name': 'Хрустал 8мм',
-  },
-  {
-    'id': '0002',
-    'name': 'Хрустал 6мм',
-  },
-  {
-    'id': '0003',
-    'name': 'Хрустал 4мм',
-  },
-  {
-    'id': '0005',
-    'name': 'Хрустал 2мм',
-  },
-  {
-    'id': '0007',
-    'name': 'Хрустал алмаз 4мм',
-  },
-  {
-    'id': '0017',
-    'name': "Стразы капля 6х10",
-  },
-  {
-    'id': '0018',
-    'name': "Стразы капля 8х13",
-  },
-  {
-    'id': '0019',
-    'name': "Стразы капля 10х14",
-  },
+final List<Map<String, String>> category = [
+  {'id': '0000', 'name': 'Все'},
+  {'id': '0001', 'name': 'Хрустал 8мм'},
+  {'id': '0002', 'name': 'Хрустал 6мм'},
+  {'id': '0003', 'name': 'Хрустал 4мм'},
+  {'id': '0005', 'name': 'Хрустал 2мм'},
+  {'id': '0007', 'name': 'Хрустал алмаз 4мм'},
+  {'id': '0017', 'name': "Стразы капля 6х10"},
+  {'id': '0018', 'name': "Стразы капля 8х13"},
+  {'id': '0019', 'name': "Стразы капля 10х14"},
+  {'id': '0010', 'name': "Поджемчук"},
+  {'id': '0011', 'name': "Шашбау"},
+  {'id': '0014', 'name': "Страз на листь"},
 ];
-int selescted = 0;
+Map<String, String> selescted = {'id': '0000', 'name': 'Все'};
 
 class MiniCatalogPlacegolder extends StatelessWidget {
   const MiniCatalogPlacegolder({super.key});
@@ -50,32 +26,30 @@ class MiniCatalogPlacegolder extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(
-          height: 28,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: category.length,
-            itemBuilder: (context, index) {
-              if (selescted == index) {
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 8.0, // Horizontal spacing between containers
+            runSpacing: 8.0, // Vertical spacing between runs
+            children: category.map((item) {
+              if (selescted['id'] == item['id']) {
                 return Container(
-                  margin: EdgeInsets.only(
-                      left: index == 0 ? 24 : 0, right: index == 7 ? 24 : 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: newBlack,
+                    color: secondMain,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 18),
-                  height: double.infinity,
-                  child: Center(
-                    child: Text(
-                      category[index]['name'].toString(),
-                      style: const TextStyle(
-                        fontFamily: 'Gilroy',
-                        color: newWhite,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w400,
-                        letterSpacing: 0,
-                      ),
+                  child: Text(
+                    item['name'] ?? '',
+                    style: const TextStyle(
+                      fontFamily: 'Gilroy',
+                      color: newWhite,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 );
@@ -85,9 +59,10 @@ class MiniCatalogPlacegolder extends StatelessWidget {
                   child: GestureDetector(
                     onTap: () {},
                     child: Container(
-                      margin: EdgeInsets.only(
-                          left: index == 0 ? 24 : 0,
-                          right: index == category.length - 1 ? 24 : 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         border: Border.all(
                           color: newBlack,
@@ -95,25 +70,20 @@ class MiniCatalogPlacegolder extends StatelessWidget {
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 18),
-                      height: double.infinity,
-                      child: Center(
-                        child: Text(
-                          category[index]['name'].toString(),
-                          style: const TextStyle(
-                            fontFamily: 'Gilroy',
-                            color: newBlack,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
-                            letterSpacing: 0,
-                          ),
+                      child: Text(
+                        item['name'] ?? '',
+                        style: const TextStyle(
+                          fontFamily: 'Gilroy',
+                          color: newBlack,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
                   ),
                 );
               }
-            },
+            }).toList(),
           ),
         ),
         const SizedBox(height: 24),
@@ -195,7 +165,7 @@ class MiniCatalogPlacegolder extends StatelessWidget {
                         onPressed: () {},
                         child: Container(
                           decoration: BoxDecoration(
-                            color: newBlack,
+                            color: secondMain,
                             borderRadius: BorderRadius.circular(8),
                             boxShadow: [
                               BoxShadow(
