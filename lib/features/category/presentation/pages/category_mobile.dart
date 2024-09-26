@@ -1,16 +1,16 @@
 import 'package:asyltas_app/core/constants.dart';
 import 'package:asyltas_app/features/cart/presentation/pages/cart_page.dart';
-import 'package:asyltas_app/features/category/presentation/widgets/category_mobile.dart';
 import 'package:asyltas_app/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:asyltas_app/features/main/presentation/pages/home_page.dart';
 import 'package:asyltas_app/features/main/presentation/widgets/home_bottom.dart';
 import 'package:asyltas_app/features/menu/presentation/pages/menu_page.dart';
 import 'package:asyltas_app/provider/cart_provider.dart';
 import 'package:asyltas_app/provider/favorites_provider.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+
+import '../widgets/catalog_category_layout.dart';
 
 class CategoryMobile extends StatelessWidget {
   const CategoryMobile({
@@ -183,7 +183,7 @@ class CategoryMobile extends StatelessWidget {
                   const SizedBox(height: 16),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: CategoryMobileList(
+                    child: CatalogCategoryLayout(
                       categoryId: categoryId,
                     ),
                   ),

@@ -2,7 +2,7 @@ import 'package:asyltas_app/core/constants.dart';
 import 'package:asyltas_app/core/models/product.dart';
 import 'package:asyltas_app/features/catalog/presentation/pages/catalog_page.dart';
 import 'package:asyltas_app/features/category/presentation/pages/category_page.dart';
-import 'package:asyltas_app/features/main/presentation/widgets/mini_catalog_placegolder.dart';
+import 'package:asyltas_app/features/main/presentation/widgets/catalog_item_shimmer.dart';
 import 'package:asyltas_app/features/product/presentation/pages/product_page.dart';
 import 'package:asyltas_app/provider/cart_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -12,10 +12,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
 
+@Deprecated('Use CatalogLayout instead')
 class MiniCatalogMobile extends StatefulWidget {
   const MiniCatalogMobile({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<MiniCatalogMobile> createState() => _MiniCatalogMobileState();
@@ -91,10 +92,10 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
           stream: FirebaseFirestore.instance.collection('products').snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const MiniCatalogPlacegolder();
+              return const CatalogItemShimmer();
             }
             if (snapshot.hasError) {
-              return const MiniCatalogPlacegolder();
+              return const CatalogItemShimmer();
             }
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
               return const Center(child: Text('Нет доступных товаров.'));
