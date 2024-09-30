@@ -55,6 +55,15 @@ class HomeMobile extends StatelessWidget {
                             ),
                             const Spacer(),
                             GestureDetector(
+                              onTap: () {},
+                              child: SvgPicture.asset(
+                                'assets/search.svg',
+                                height: 24,
+                                width: 24,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            GestureDetector(
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -136,7 +145,6 @@ class HomeMobile extends StatelessWidget {
                     const CustomCarousel(),
                     const SizedBox(height: 20),
                     const ShopWidget(),
-                    const SizedBox(height: 20),
                     const CatalogLayout(),
                     //const MiniCatalogMobile(),
                     const SizedBox(height: 16),

@@ -74,6 +74,7 @@ class CategoriesPanel extends StatelessWidget {
                       onTap: () {
                         controller.setCategory(e);
                       },
+                      count: e.count,
                     );
                   }).toList()),
             );

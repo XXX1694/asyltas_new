@@ -1,6 +1,8 @@
+import 'package:asyltas_app/features/cart/presentation/pages/cart_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/constants.dart';
@@ -29,10 +31,18 @@ class _CatalogItemState extends State<CatalogItem> {
   //   currentCount = widget.item.count ?? 0;
   //   super.initState();
   // }
+  late TextEditingController itemCount;
+  @override
+  void initState() {
+    itemCount = TextEditingController();
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     int currentCount = widget.item.count ?? 0;
+    itemCount.text = currentCount.toString();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -202,8 +212,14 @@ class _CatalogItemState extends State<CatalogItem> {
                             widget.showCustomSnackBar!(
                                 context, 'Удалено из корзины!');
                           } else {
-                            widget.showCustomSnackBar!(context,
-                                'Количество уменьшено: ${currentCount - 1}');
+                            // widget.showCustomSnackBar!(context,
+                            //     'Количество уменьшено: ${currentCount - 1}');
+                            int totalPrice =
+                                context.read<CartProvider>().totalPrice;
+                            showTotalPriceSnackBar(
+                              context,
+                              totalPrice.toDouble(),
+                            );
                           }
                           setState(() {});
                         }
@@ -214,30 +230,70 @@ class _CatalogItemState extends State<CatalogItem> {
                   ),
                 ),
                 // Отображение текущего количества
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Text(
-                    '$currentCount',
+                SizedBox(
+                  width: 40,
+                  child: TextField(
+                    textAlign: TextAlign.center,
+                    controller: itemCount,
                     style: const TextStyle(
                       fontFamily: 'Gilroy',
                       color: newBlack,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      labelStyle: TextStyle(
+                        fontFamily: 'Gilroy',
+                        color: newBlack,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      hintStyle: TextStyle(
+                        fontFamily: 'Gilroy',
+                        color: newBlack,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                    onSubmitted: (value) {
+                      currentCount = int.parse(value);
+                      widget.item.count = currentCount;
+                      context.read<CartProvider>().updateItem(widget.item);
+                      int totalPrice = context.read<CartProvider>().totalPrice;
+                      showTotalPriceSnackBar(
+                        context,
+                        totalPrice.toDouble(),
+                      );
+                    },
                   ),
                 ),
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(horizontal: 12),
+                //   child: Text(
+                //     '$currentCount',
+                //     style: const TextStyle(
+                //       fontFamily: 'Gilroy',
+                //       color: newBlack,
+                //       fontSize: 15,
+                //       fontWeight: FontWeight.w600,
+                //     ),
+                //   ),
+                // ),
                 // Кнопка "+"
                 CupertinoButton(
                   padding: EdgeInsets.zero,
                   onPressed: () {
                     context.read<CartProvider>().incrementCount(widget.item);
-                    if (currentCount + 1 == 1) {
-                      widget.showCustomSnackBar!(
-                          context, 'Добавлен в корзину!');
-                    } else {
-                      widget.showCustomSnackBar!(
-                          context, 'Количество увеличено: ${currentCount + 1}');
-                    }
+                    int totalPrice = context.read<CartProvider>().totalPrice;
+                    showTotalPriceSnackBar(
+                      context,
+                      totalPrice.toDouble(),
+                    );
                     setState(() {});
                   },
                   child: const Icon(
@@ -251,5 +307,39 @@ class _CatalogItemState extends State<CatalogItem> {
         ),
       ],
     );
+  }
+
+  void showTotalPriceSnackBar(BuildContext context, double totalPrice) {
+    // Remove any existing SnackBar to prevent stacking
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+    final snackBar = SnackBar(
+      content: Text(
+        'Общий: $totalPrice,00 ₸',
+        style: const TextStyle(fontWeight: FontWeight.bold, color: newWhite),
+      ),
+      behavior: SnackBarBehavior.floating,
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      duration: const Duration(seconds: 2),
+      backgroundColor: newBlack,
+      // Optionally, add an action
+      action: SnackBarAction(
+        label: 'В корзину',
+        textColor: newWhite,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CartPage(),
+            ),
+          );
+        },
+      ),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

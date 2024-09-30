@@ -9,12 +9,13 @@ class MiniCatalogShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StaggeredGrid.count(
-        mainAxisSpacing: 16,
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        children: List.generate(
-          6,
-          (index) => const CatalogItemShimmer(),
-        ));
+      mainAxisSpacing: 16,
+      crossAxisCount: 2,
+      crossAxisSpacing: 12,
+      children: List.generate(
+        6,
+        (index) => const CatalogItemShimmer(),
+      ),
+    );
   }
 }

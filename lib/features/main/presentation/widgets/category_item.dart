@@ -7,12 +7,14 @@ class CategoryItem extends StatelessWidget {
     required this.text,
     required this.onTap,
     required this.isSelected,
+    required this.count,
     super.key,
   });
 
   final String text;
   final VoidCallback onTap;
   final bool isSelected;
+  final int? count;
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +31,41 @@ class CategoryItem extends StatelessWidget {
             color: secondMain,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Text(
-            text,
-            style: const TextStyle(
-              fontFamily: 'Gilroy',
-              color: newWhite,
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                text,
+                style: const TextStyle(
+                  fontFamily: 'Gilroy',
+                  color: newWhite,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              count != null
+                  ? const Text(
+                      ' - ',
+                      style: TextStyle(
+                        fontFamily: 'Gilroy',
+                        color: newWhite,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    )
+                  : const SizedBox(),
+              count != null
+                  ? Text(
+                      count.toString(),
+                      style: const TextStyle(
+                        fontFamily: 'Gilroy',
+                        color: newWhite,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    )
+                  : const SizedBox(),
+            ],
           ),
         ),
       ),
