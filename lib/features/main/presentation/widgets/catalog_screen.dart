@@ -9,9 +9,11 @@ class CatalogScreen extends StatefulWidget {
   const CatalogScreen({
     super.key,
     required this.currentCategoryId,
+    this.parentScrollController,
   });
 
   final String currentCategoryId;
+  final ScrollController? parentScrollController;
 
   @override
   State<CatalogScreen> createState() => _CatalogScreenState();
@@ -25,7 +27,7 @@ class _CatalogScreenState extends State<CatalogScreen>
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
+    _scrollController = widget.parentScrollController ?? ScrollController();
     _scrollController.addListener(_onScroll);
     context.read<CatalogBloc>().add(LoadCatalog(categoryId: currentCategoryId));
   }
@@ -62,15 +64,14 @@ class _CatalogScreenState extends State<CatalogScreen>
       builder: (BuildContext context, CatalogState state) {
         if (state is CatalogLoaded) {
           final products = state.products;
-          if(products.isEmpty){
+          if (products.isEmpty) {
             return const Center(
               child: Text('Нет товаров в данной категории'),
             );
           }
 
-
           return LimitedBox(
-            maxHeight: MediaQuery.of(context).size.height ,
+            maxHeight: MediaQuery.of(context).size.height,
             child: GridView.builder(
               controller: _scrollController,
               padding: const EdgeInsets.all(0),
@@ -80,8 +81,7 @@ class _CatalogScreenState extends State<CatalogScreen>
                 crossAxisSpacing: 12,
                 childAspectRatio: 0.7,
               ),
-              itemCount:
-              state.hasNext ? products.length : products.length + 1,
+              itemCount: state.hasNext ? products.length : products.length + 1,
               itemBuilder: (context, index) {
                 if (index < products.length) {
                   final product = products[index];
@@ -94,7 +94,8 @@ class _CatalogScreenState extends State<CatalogScreen>
                 }
               },
             ),
-          );        }
+          );
+        }
         if (state is CatalogError) {
           return Center(
             child: Text(state.message),
