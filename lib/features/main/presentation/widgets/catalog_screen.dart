@@ -10,9 +10,11 @@ class CatalogScreen extends StatefulWidget {
   const CatalogScreen({
     super.key,
     required this.currentCategoryId,
+    this.parentScrollController,
   });
 
   final String currentCategoryId;
+  final ScrollController? parentScrollController;
 
   @override
   State<CatalogScreen> createState() => _CatalogScreenState();
@@ -26,7 +28,7 @@ class _CatalogScreenState extends State<CatalogScreen>
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
+    _scrollController = widget.parentScrollController ?? ScrollController();
     _scrollController.addListener(_onScroll);
     context.read<CatalogBloc>().add(LoadCatalog(categoryId: currentCategoryId));
   }

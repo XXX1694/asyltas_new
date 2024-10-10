@@ -14,8 +14,47 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
-class HomeMobile extends StatelessWidget {
+class HomeMobile extends StatefulWidget {
   const HomeMobile({super.key});
+
+  @override
+  State<HomeMobile> createState() => _HomeMobileState();
+}
+
+class _HomeMobileState extends State<HomeMobile> {
+  final catalogScrollController = ScrollController();
+  final mainScrollController = ScrollController();
+  bool _showBackToTopButton =
+      false; // Добавляем переменную для видимости кнопки
+
+  @override
+  void initState() {
+    super.initState();
+    catalogScrollController
+        .addListener(_scrollListener); // Добавляем слушатель прокрутки
+  }
+
+  @override
+  void dispose() {
+    catalogScrollController
+        .removeListener(_scrollListener); // Удаляем слушатель
+    catalogScrollController.dispose(); // Освобождаем контроллер
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (catalogScrollController.offset >= 200) {
+      // Если прокручено более 200 пикселей, показываем кнопку
+      setState(() {
+        _showBackToTopButton = true;
+      });
+    } else {
+      // Иначе скрываем кнопку
+      setState(() {
+        _showBackToTopButton = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +70,7 @@ class HomeMobile extends StatelessWidget {
           child: Stack(
             children: [
               SingleChildScrollView(
+                controller: mainScrollController,
                 child: Column(
                   children: [
                     const SizedBox(height: 20),
@@ -145,7 +185,9 @@ class HomeMobile extends StatelessWidget {
                     const CustomCarousel(),
                     const SizedBox(height: 20),
                     const ShopWidget(),
-                    const CatalogLayout(),
+                    CatalogLayout(
+                      parentScrollController: catalogScrollController,
+                    ),
                     //const MiniCatalogMobile(),
                     const SizedBox(height: 16),
                     const HomeBottom(),
@@ -230,11 +272,34 @@ class HomeMobile extends StatelessWidget {
                     ),
                   ),
                 ),
-              )
+              ),
+              if (_showBackToTopButton)
+                Positioned(
+                  bottom: 80,
+                  right: 16,
+                  child: FloatingActionButton(
+                    onPressed: _scrollToTop,
+                    backgroundColor: Colors.blue, // Задайте нужный цвет
+                    child: const Icon(Icons.arrow_upward),
+                  ),
+                ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  void _scrollToTop() {
+    catalogScrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+    mainScrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
     );
   }
 }
