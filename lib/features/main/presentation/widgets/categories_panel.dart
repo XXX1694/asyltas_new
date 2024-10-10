@@ -57,32 +57,28 @@ class CategoriesPanel extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        SizedBox(
-          height: 28,
-          child: ValueListenableBuilder<CategoryProduct>(
-            valueListenable: controller,
-            builder: (context, category, _) {
-              return ScrollConfiguration(
-                behavior: HideScrollPanel(),
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: categoryProducts.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(width: 8),
-                  itemBuilder: (context, index) {
-                    final e = categoryProducts[index];
+        ValueListenableBuilder<CategoryProduct>(
+          valueListenable: controller,
+          builder: (context, category, _) {
+            return ScrollConfiguration(
+              behavior: HideScrollPanel(),
+              child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: categoryProducts.map((item) {
+                    final e = item;
                     return CategoryItem(
                       text: e.name,
                       isSelected: e == category,
                       onTap: () {
                         controller.setCategory(e);
                       },
+                      count: e.count,
                     );
-                  },
-                ),
-              );
-            },
-          ),
+                  }).toList()),
+            );
+          },
         ),
       ],
     );

@@ -59,7 +59,7 @@ class CatalogItemShimmer extends StatelessWidget {
               onPressed: () {},
               child: Container(
                 decoration: BoxDecoration(
-                  color: newBlack,
+                  color: secondMain,
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(

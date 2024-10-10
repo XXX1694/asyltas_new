@@ -2,7 +2,7 @@ import 'package:asyltas_app/core/constants.dart';
 import 'package:asyltas_app/core/models/product.dart';
 import 'package:asyltas_app/features/catalog/presentation/pages/catalog_page.dart';
 import 'package:asyltas_app/features/category/presentation/pages/category_page.dart';
-import 'package:asyltas_app/features/main/presentation/widgets/mini_catalog_placegolder.dart';
+import 'package:asyltas_app/features/main/presentation/widgets/catalog_item_shimmer.dart';
 import 'package:asyltas_app/features/product/presentation/pages/product_page.dart';
 import 'package:asyltas_app/provider/cart_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -24,57 +24,22 @@ class MiniCatalogMobile extends StatefulWidget {
 
 class _MiniCatalogMobileState extends State<MiniCatalogMobile>
     with TickerProviderStateMixin {
-  List<Map<String, String>> category = [
-    {
-      'id': '0000',
-      'name': 'Все',
-    },
-    {
-      'id': '0001',
-      'name': 'Хрустал 8мм',
-    },
-    {
-      'id': '0002',
-      'name': 'Хрустал 6мм',
-    },
-    {
-      'id': '0003',
-      'name': 'Хрустал 4мм',
-    },
-    {
-      'id': '0005',
-      'name': 'Хрустал 2мм',
-    },
-    {
-      'id': '0007',
-      'name': 'Хрустал алмаз 4мм',
-    },
-    {
-      'id': '0017',
-      'name': "Стразы капля 6х10",
-    },
-    {
-      'id': '0018',
-      'name': "Стразы капля 8х13",
-    },
-    {
-      'id': '0019',
-      'name': "Стразы капля 10х14",
-    },
-    {
-      'id': '0010',
-      'name': "Поджемчук",
-    },
-    {
-      'id': '0011',
-      'name': "Шашбау",
-    },
-    {
-      'id': '0014',
-      'name': "Страз на листь",
-    },
+  final List<Map<String, String>> category = [
+    {'id': '0000', 'name': 'Все'},
+    {'id': '0001', 'name': 'Хрустал 8мм'},
+    {'id': '0002', 'name': 'Хрустал 6мм'},
+    {'id': '0003', 'name': 'Хрустал 4мм'},
+    {'id': '0005', 'name': 'Хрустал 2мм'},
+    {'id': '0007', 'name': 'Хрустал алмаз 4мм'},
+    {'id': '0017', 'name': "Стразы капля 6х10"},
+    {'id': '0018', 'name': "Стразы капля 8х13"},
+    {'id': '0019', 'name': "Стразы капля 10х14"},
+    {'id': '0010', 'name': "Поджемчук"},
+    {'id': '0011', 'name': "Шашбау"},
+    {'id': '0014', 'name': "Страз на листь"},
   ];
-  int selescted = 0;
+
+  Map<String, String> selected = {'id': '0000', 'name': 'Все'};
   List products = [];
   List<ProductModel> categoryProducts = [];
 
@@ -82,9 +47,8 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        // Заголовок и кнопка "Посмотреть всё"
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Row(
@@ -95,9 +59,8 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                 style: TextStyle(
                   fontFamily: 'Gilroy',
                   color: newBlack,
-                  fontSize: 17,
+                  fontSize: 19,
                   fontWeight: FontWeight.w600,
-                  letterSpacing: 0,
                 ),
               ),
               CupertinoButton(
@@ -115,9 +78,8 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                   style: TextStyle(
                     fontFamily: 'Gilroy',
                     color: newMainColor,
-                    fontSize: 15,
+                    fontSize: 17,
                     fontWeight: FontWeight.w500,
-                    letterSpacing: 0,
                   ),
                 ),
               ),
@@ -125,22 +87,23 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
           ),
         ),
         const SizedBox(height: 8),
+        // Слушатель изменений в Firestore
         StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance.collection('products').snapshots(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const MiniCatalogShimmer();
+              return const CatalogItemShimmer();
             }
             if (snapshot.hasError) {
-              return const MiniCatalogShimmer();
+              return const CatalogItemShimmer();
             }
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return const Center(child: Text('No products available.'));
+              return const Center(child: Text('Нет доступных товаров.'));
             }
             products = snapshot.data!.docs;
             categoryProducts = [];
-            if (category[selescted]['id'] == '0000') {
-              for (int i = 0; i < 14; i++) {
+            if (selected['id'] == '0000') {
+              for (int i = 0; i < 14 && i < products.length; i++) {
                 final product = products[i].data() as Map<String, dynamic>;
                 categoryProducts.add(ProductModel.fromJson(product));
                 categoryProducts.last.id = snapshot.data!.docs[i].id;
@@ -152,12 +115,12 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                 String productCategoryId =
                     (product['category_id'] ?? '').toString();
 
-                if (productCategoryId == category[selescted]['id']) {
+                if (productCategoryId == selected['id']) {
                   tempCategoryProducts.add(ProductModel.fromJson(product));
                   tempCategoryProducts.last.id = snapshot.data!.docs[i].id;
                 }
               }
-              for (int i = 0; i < 14; i++) {
+              for (int i = 0; i < 14 && i < tempCategoryProducts.length; i++) {
                 categoryProducts.add(tempCategoryProducts[i]);
               }
             }
@@ -167,34 +130,31 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                   void Function(void Function()) setStatee) {
                 return Column(
                   children: [
-                    SizedBox(
-                      height: 28,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: category.length,
-                        itemBuilder: (context, index) {
-                          if (selescted == index) {
+                    // Отображение категорий
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 8.0,
+                        runSpacing: 8.0,
+                        children: category.map((item) {
+                          if (selected['id'] == item['id']) {
                             return Container(
-                              margin: EdgeInsets.only(
-                                  left: index == 0 ? 24 : 0,
-                                  right: index == 7 ? 24 : 12),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
-                                color: newBlack,
+                                color: secondMain,
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 18),
-                              height: double.infinity,
-                              child: Center(
-                                child: Text(
-                                  category[index]['name'].toString(),
-                                  style: const TextStyle(
-                                    fontFamily: 'Gilroy',
-                                    color: newWhite,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w400,
-                                    letterSpacing: 0,
-                                  ),
+                              child: Text(
+                                item['name'] ?? '',
+                                style: const TextStyle(
+                                  fontFamily: 'Gilroy',
+                                  color: newWhite,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             );
@@ -203,11 +163,13 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                               opacity: 0.54,
                               child: GestureDetector(
                                 onTap: () {
-                                  selescted = index;
+                                  selected = item;
                                   categoryProducts = [];
 
-                                  if (category[selescted]['id'] == '0000') {
-                                    for (int i = 0; i < 14; i++) {
+                                  if (selected['id'] == '0000') {
+                                    for (int i = 0;
+                                        i < 14 && i < products.length;
+                                        i++) {
                                       final product = products[i].data()
                                           as Map<String, dynamic>;
                                       categoryProducts
@@ -225,15 +187,17 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                                           (product['category_id'] ?? '')
                                               .toString();
 
-                                      if (productCategoryId ==
-                                          category[selescted]['id']) {
+                                      if (productCategoryId == selected['id']) {
                                         tempCategoryProducts.add(
                                             ProductModel.fromJson(product));
                                         tempCategoryProducts.last.id =
                                             snapshot.data!.docs[i].id;
                                       }
                                     }
-                                    for (int i = 0; i < 14; i++) {
+                                    for (int i = 0;
+                                        i < 14 &&
+                                            i < tempCategoryProducts.length;
+                                        i++) {
                                       categoryProducts
                                           .add(tempCategoryProducts[i]);
                                     }
@@ -241,11 +205,10 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                                   setStatee(() {});
                                 },
                                 child: Container(
-                                  margin: EdgeInsets.only(
-                                      left: index == 0 ? 24 : 0,
-                                      right: index == category.length - 1
-                                          ? 24
-                                          : 12),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 4,
+                                  ),
                                   decoration: BoxDecoration(
                                     border: Border.all(
                                       color: newBlack,
@@ -253,29 +216,24 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                                     ),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 18),
-                                  height: double.infinity,
-                                  child: Center(
-                                    child: Text(
-                                      category[index]['name'].toString(),
-                                      style: const TextStyle(
-                                        fontFamily: 'Gilroy',
-                                        color: newBlack,
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w400,
-                                        letterSpacing: 0,
-                                      ),
+                                  child: Text(
+                                    item['name'] ?? '',
+                                    style: const TextStyle(
+                                      fontFamily: 'Gilroy',
+                                      color: newBlack,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ),
                               ),
                             );
                           }
-                        },
+                        }).toList(),
                       ),
                     ),
                     const SizedBox(height: 24),
+                    // Отображение товаров
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: StaggeredGrid.count(
@@ -283,6 +241,14 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                         crossAxisCount: 2,
                         crossAxisSpacing: 12,
                         children: categoryProducts.map((item) {
+                          // Проверяем, есть ли товар в корзине
+                          final cartItem =
+                              context.watch<CartProvider>().firstWhereOrNull(
+                                    (cartItem) => cartItem.id == item.id,
+                                  );
+
+                          int currentCount = cartItem?.count ?? 0;
+
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
@@ -386,7 +352,6 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                                       fontWeight: FontWeight.w600,
                                     ),
                                     textAlign: TextAlign.center,
-                                    // overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
@@ -399,86 +364,70 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                                     ),
                                   ),
                                   const SizedBox(height: 4),
-                                  CupertinoButton(
-                                    padding: const EdgeInsets.all(0),
-                                    onPressed: () async {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ProductPage(
-                                            product: item,
-                                          ),
+                                  // Счетчик с кнопками "+" и "-"
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      // Кнопка "-"
+                                      CupertinoButton(
+                                        padding: EdgeInsets.zero,
+                                        onPressed: currentCount > 0
+                                            ? () {
+                                                context
+                                                    .read<CartProvider>()
+                                                    .decrementCount(item);
+                                                if (currentCount - 1 == 0) {
+                                                  showCustomSnackBar(context,
+                                                      'Удалено из корзины!');
+                                                } else {
+                                                  showCustomSnackBar(context,
+                                                      'Количество уменьшено: ${currentCount - 1}');
+                                                }
+                                              }
+                                            : null,
+                                        child: Icon(
+                                          Icons.remove,
+                                          color: currentCount > 0
+                                              ? newBlack
+                                              : Colors.grey,
                                         ),
-                                      );
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: secondMain,
-                                        borderRadius: BorderRadius.circular(8),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            offset: const Offset(5, 5),
-                                            blurRadius: 15,
-                                            color:
-                                                Colors.black.withOpacity(0.1),
-                                          ),
-                                        ],
                                       ),
-                                      height: 32,
-                                      width: double.infinity,
-                                      child: const Center(
+                                      // Отображение текущего количества
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12),
                                         child: Text(
-                                          'Подробнее',
-                                          style: TextStyle(
-                                            fontFamily: 'Gilroy',
-                                            color: newWhite,
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w400,
-                                            letterSpacing: 0,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  CupertinoButton(
-                                    padding: const EdgeInsets.all(0),
-                                    onPressed: () {
-                                      item.count = 1;
-                                      bool res =
-                                          context.read<CartProvider>().addItem(
-                                                item,
-                                              );
-                                      if (res) {
-                                        showCustomSnackBar(
-                                            context, 'Добавлен в корзину!');
-                                      } else {
-                                        showCustomSnackBar(context, '+1');
-                                      }
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                          color: newBlack,
-                                          width: 1,
-                                        ),
-                                      ),
-                                      height: 32,
-                                      width: double.infinity,
-                                      child: const Center(
-                                        child: Text(
-                                          'В корзину',
-                                          style: TextStyle(
+                                          '$currentCount',
+                                          style: const TextStyle(
                                             fontFamily: 'Gilroy',
                                             color: newBlack,
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w400,
-                                            letterSpacing: 0,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  )
+                                      // Кнопка "+"
+                                      CupertinoButton(
+                                        padding: EdgeInsets.zero,
+                                        onPressed: () {
+                                          context
+                                              .read<CartProvider>()
+                                              .incrementCount(item);
+                                          if (currentCount + 1 == 1) {
+                                            showCustomSnackBar(
+                                                context, 'Добавлен в корзину!');
+                                          } else {
+                                            showCustomSnackBar(context,
+                                                'Количество увеличено: ${currentCount + 1}');
+                                          }
+                                        },
+                                        child: const Icon(
+                                          Icons.add,
+                                          color: newBlack,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
                             ],
@@ -487,6 +436,7 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                       ),
                     ),
                     const SizedBox(height: 16),
+                    // Кнопка "Все товары"
                     CupertinoButton(
                       padding: const EdgeInsets.all(0),
                       child: Container(
@@ -513,7 +463,7 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                         ),
                       ),
                       onPressed: () async {
-                        if (category[selescted]['id'] == '0000') {
+                        if (selected['id'] == '0000') {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -525,10 +475,8 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                             context,
                             MaterialPageRoute(
                               builder: (context) => CategoryPgae(
-                                categoryId:
-                                    category[selescted]['id'].toString(),
-                                categoryName:
-                                    category[selescted]['name'].toString(),
+                                categoryId: selected['id'].toString(),
+                                categoryName: selected['name'].toString(),
                               ),
                             ),
                           );
@@ -548,12 +496,24 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
 
   void showCustomSnackBar(BuildContext context, String message) {
     final overlay = Overlay.of(context);
+    final animationController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+    final animation = Tween<Offset>(
+      begin: const Offset(1.0, 0.0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: animationController,
+      curve: Curves.easeOut,
+    ));
+
     final overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
         right: 0,
         bottom: MediaQuery.of(context).size.height * 0.12,
         child: SlideTransition(
-          position: _slideAnimation(),
+          position: animation,
           child: Material(
             color: Colors.transparent,
             child: Container(
@@ -579,26 +539,13 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
     );
 
     overlay.insert(overlayEntry);
+    animationController.forward();
 
     Future.delayed(const Duration(milliseconds: 1000), () {
-      overlayEntry.remove();
+      animationController.reverse().then((value) {
+        overlayEntry.remove();
+        animationController.dispose();
+      });
     });
-  }
-
-  Animation<Offset> _slideAnimation() {
-    final animationController = AnimationController(
-      duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
-    final animation = Tween<Offset>(
-      begin: const Offset(1.0, 0.0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: animationController,
-      curve: Curves.easeOut,
-    ));
-
-    animationController.forward();
-    return animation;
   }
 }

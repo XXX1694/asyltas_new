@@ -1,6 +1,8 @@
+import 'package:asyltas_app/features/cart/presentation/pages/cart_page.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/constants.dart';
@@ -8,18 +10,39 @@ import '../../../../core/models/product.dart';
 import '../../../../provider/cart_provider.dart';
 import '../../../product/presentation/pages/product_page.dart';
 
-class CatalogItem extends StatelessWidget {
+class CatalogItem extends StatefulWidget {
   const CatalogItem({
     required this.item,
-     this.showCustomSnackBar,
+    this.showCustomSnackBar,
     super.key,
   });
 
   final ProductModel item;
-  final Function(String)? showCustomSnackBar;
+  final Function(BuildContext, String)? showCustomSnackBar;
+
+  @override
+  State<CatalogItem> createState() => _CatalogItemState();
+}
+
+class _CatalogItemState extends State<CatalogItem> {
+  // int currentCount = 0;
+  // @override
+  // void initState() {
+  //   currentCount = widget.item.count ?? 0;
+  //   super.initState();
+  // }
+  late TextEditingController itemCount;
+  @override
+  void initState() {
+    itemCount = TextEditingController();
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    int currentCount = widget.item.count ?? 0;
+    itemCount.text = currentCount.toString();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -30,7 +53,7 @@ class CatalogItem extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => ProductPage(
-                  product: item,
+                  product: widget.item,
                 ),
               ),
             );
@@ -49,7 +72,7 @@ class CatalogItem extends StatelessWidget {
                     child: CachedNetworkImage(
                       fadeInDuration: const Duration(seconds: 0),
                       fadeOutDuration: const Duration(seconds: 0),
-                      imageUrl: item.images?[0] ?? '',
+                      imageUrl: widget.item.images?[0] ?? '',
                       fit: BoxFit.cover,
                       progressIndicatorBuilder: (context, url, progress) {
                         return Container(
@@ -87,7 +110,7 @@ class CatalogItem extends StatelessWidget {
                         ),
                         child: Center(
                           child: Text(
-                            "${item.numberLeft ?? 0} шт",
+                            "${widget.item.numberLeft ?? 0} шт",
                             maxLines: 1,
                             style: const TextStyle(
                               color: newBlack,
@@ -110,7 +133,7 @@ class CatalogItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              item.name ?? '',
+              widget.item.name ?? '',
               maxLines: 1,
               style: const TextStyle(
                 fontFamily: 'Gilroy',
@@ -123,7 +146,7 @@ class CatalogItem extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              "${item.price},00 ₸",
+              "${widget.item.price},00 ₸",
               style: const TextStyle(
                 fontFamily: 'Gilroy',
                 color: newBlack,
@@ -139,7 +162,7 @@ class CatalogItem extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => ProductPage(
-                      product: item,
+                      product: widget.item,
                     ),
                   ),
                 );
@@ -172,46 +195,151 @@ class CatalogItem extends StatelessWidget {
                 ),
               ),
             ),
-            CupertinoButton(
-              padding: const EdgeInsets.all(0),
-              onPressed: () {
-                item.count = 1;
-                bool res = context.read<CartProvider>().addItem(
-                      item,
-                    );
-                if (res) {
-                  showCustomSnackBar?.call('Добавлен в корзину!');
-                } else {
-                  showCustomSnackBar?.call('+1');
-                }
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: newBlack,
-                    width: 1,
+            const SizedBox(height: 4),
+            // Счетчик с кнопками "+" и "-"
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Кнопка "-"
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: currentCount > 0
+                      ? () {
+                          context
+                              .read<CartProvider>()
+                              .decrementCount(widget.item);
+                          if (currentCount - 1 == 0) {
+                            widget.showCustomSnackBar!(
+                                context, 'Удалено из корзины!');
+                          } else {
+                            // widget.showCustomSnackBar!(context,
+                            //     'Количество уменьшено: ${currentCount - 1}');
+                            int totalPrice =
+                                context.read<CartProvider>().totalPrice;
+                            showTotalPriceSnackBar(
+                              context,
+                              totalPrice.toDouble(),
+                            );
+                          }
+                          setState(() {});
+                        }
+                      : null,
+                  child: Icon(
+                    Icons.remove,
+                    color: currentCount > 0 ? newBlack : Colors.grey,
                   ),
                 ),
-                height: 32,
-                width: double.infinity,
-                child: const Center(
-                  child: Text(
-                    'В корзину',
-                    style: TextStyle(
+                // Отображение текущего количества
+                SizedBox(
+                  width: 40,
+                  child: TextField(
+                    textAlign: TextAlign.center,
+                    controller: itemCount,
+                    style: const TextStyle(
                       fontFamily: 'Gilroy',
                       color: newBlack,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400,
-                      letterSpacing: 0,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
                     ),
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      labelStyle: TextStyle(
+                        fontFamily: 'Gilroy',
+                        color: newBlack,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      hintStyle: TextStyle(
+                        fontFamily: 'Gilroy',
+                        color: newBlack,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                    onSubmitted: (value) {
+                      currentCount = int.parse(value);
+                      widget.item.count = currentCount;
+                      context.read<CartProvider>().updateItem(widget.item);
+                      int totalPrice = context.read<CartProvider>().totalPrice;
+                      showTotalPriceSnackBar(
+                        context,
+                        totalPrice.toDouble(),
+                      );
+                    },
                   ),
                 ),
-              ),
-            )
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(horizontal: 12),
+                //   child: Text(
+                //     '$currentCount',
+                //     style: const TextStyle(
+                //       fontFamily: 'Gilroy',
+                //       color: newBlack,
+                //       fontSize: 15,
+                //       fontWeight: FontWeight.w600,
+                //     ),
+                //   ),
+                // ),
+                // Кнопка "+"
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    context.read<CartProvider>().incrementCount(widget.item);
+                    int totalPrice = context.read<CartProvider>().totalPrice;
+                    showTotalPriceSnackBar(
+                      context,
+                      totalPrice.toDouble(),
+                    );
+                    setState(() {});
+                  },
+                  child: const Icon(
+                    Icons.add,
+                    color: newBlack,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ],
     );
+  }
+
+  void showTotalPriceSnackBar(BuildContext context, double totalPrice) {
+    // Remove any existing SnackBar to prevent stacking
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+    final snackBar = SnackBar(
+      content: Text(
+        'Общий: $totalPrice,00 ₸',
+        style: const TextStyle(fontWeight: FontWeight.bold, color: newWhite),
+      ),
+      behavior: SnackBarBehavior.floating,
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      duration: const Duration(seconds: 2),
+      backgroundColor: newBlack,
+      // Optionally, add an action
+      action: SnackBarAction(
+        label: 'В корзину',
+        textColor: newWhite,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CartPage(),
+            ),
+          );
+        },
+      ),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

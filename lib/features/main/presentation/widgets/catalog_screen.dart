@@ -1,3 +1,4 @@
+import 'package:asyltas_app/provider/cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants.dart';
@@ -79,11 +80,16 @@ class _CatalogScreenState extends State<CatalogScreen>
                 crossAxisCount: 2,
                 mainAxisSpacing: 16,
                 crossAxisSpacing: 12,
-                childAspectRatio: 0.7,
+                childAspectRatio: 0.56,
               ),
               itemCount: state.hasNext ? products.length : products.length + 1,
               itemBuilder: (context, index) {
                 if (index < products.length) {
+                  final cartItem =
+                      context.watch<CartProvider>().firstWhereOrNull(
+                            (cartItem) => cartItem.id == products[index].id,
+                          );
+                  products[index].count = cartItem?.count ?? 0;
                   final product = products[index];
                   return CatalogItem(
                     item: product,
@@ -107,14 +113,26 @@ class _CatalogScreenState extends State<CatalogScreen>
     );
   }
 
-  void showCustomSnackBar(String message) {
+  void showCustomSnackBar(BuildContext context, String message) {
     final overlay = Overlay.of(context);
+    final animationController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+    final animation = Tween<Offset>(
+      begin: const Offset(1.0, 0.0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: animationController,
+      curve: Curves.easeOut,
+    ));
+
     final overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
         right: 0,
         bottom: MediaQuery.of(context).size.height * 0.12,
         child: SlideTransition(
-          position: _slideAnimation(),
+          position: animation,
           child: Material(
             color: Colors.transparent,
             child: Container(
@@ -140,26 +158,13 @@ class _CatalogScreenState extends State<CatalogScreen>
     );
 
     overlay.insert(overlayEntry);
+    animationController.forward();
 
     Future.delayed(const Duration(milliseconds: 1000), () {
-      overlayEntry.remove();
+      animationController.reverse().then((value) {
+        overlayEntry.remove();
+        animationController.dispose();
+      });
     });
-  }
-
-  Animation<Offset> _slideAnimation() {
-    final animationController = AnimationController(
-      duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
-    final animation = Tween<Offset>(
-      begin: const Offset(1.0, 0.0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: animationController,
-      curve: Curves.easeOut,
-    ));
-
-    animationController.forward();
-    return animation;
   }
 }
