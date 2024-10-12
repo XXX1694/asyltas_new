@@ -24,32 +24,37 @@ class HomeMobile extends StatefulWidget {
 class _HomeMobileState extends State<HomeMobile> {
   final catalogScrollController = ScrollController();
   final mainScrollController = ScrollController();
-  bool _showBackToTopButton =
-      false; // Добавляем переменную для видимости кнопки
+  bool _showBackToTopButton = false;
 
   @override
   void initState() {
     super.initState();
-    catalogScrollController
-        .addListener(_scrollListener); // Добавляем слушатель прокрутки
+    mainScrollController.addListener(_mainScrollListener);
+    catalogScrollController.addListener(_catalogScrollListener);
   }
 
   @override
   void dispose() {
-    catalogScrollController
-        .removeListener(_scrollListener); // Удаляем слушатель
-    catalogScrollController.dispose(); // Освобождаем контроллер
+    mainScrollController.removeListener(_mainScrollListener);
+    catalogScrollController.removeListener(_catalogScrollListener);
+    catalogScrollController.dispose();
     super.dispose();
   }
 
-  void _scrollListener() {
-    if (catalogScrollController.offset >= 200) {
-      // Если прокручено более 200 пикселей, показываем кнопку
+  void _mainScrollListener() {
+    if (mainScrollController.offset >= 30) {
+      setState(() {
+        _showBackToTopButton = true;
+      });
+    }
+  }
+
+  void _catalogScrollListener() {
+    if (catalogScrollController.offset >= 30) {
       setState(() {
         _showBackToTopButton = true;
       });
     } else {
-      // Иначе скрываем кнопку
       setState(() {
         _showBackToTopButton = false;
       });
@@ -291,6 +296,7 @@ class _HomeMobileState extends State<HomeMobile> {
   }
 
   void _scrollToTop() {
+    _showBackToTopButton = false;
     catalogScrollController.animateTo(
       0,
       duration: const Duration(milliseconds: 500),
