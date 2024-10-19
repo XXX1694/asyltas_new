@@ -7,10 +7,12 @@ import '../../../main/presentation/bloc/catalog_bloc.dart';
 class CatalogCategoryLayout extends StatelessWidget {
   const CatalogCategoryLayout({
     required this.categoryId,
+    required this.controller,
     super.key,
   });
 
   final String categoryId;
+  final ScrollController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +20,7 @@ class CatalogCategoryLayout extends StatelessWidget {
       create: (_) => CatalogBloc()..add(LoadCatalog(categoryId: categoryId)),
       child: CatalogCategory(
         categoryId: categoryId,
+        controller: controller,
       ),
     );
   }

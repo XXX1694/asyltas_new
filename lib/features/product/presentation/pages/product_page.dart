@@ -4,6 +4,7 @@ import 'package:asyltas_app/features/cart/presentation/pages/cart_page.dart';
 import 'package:asyltas_app/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:asyltas_app/features/main/presentation/pages/home_page.dart';
 import 'package:asyltas_app/features/menu/presentation/pages/menu_page.dart';
+import 'package:asyltas_app/features/product/presentation/widgets/full_screen_image.dart';
 import 'package:asyltas_app/features/product/presentation/widgets/like_button.dart';
 import 'package:asyltas_app/provider/cart_provider.dart';
 import 'package:asyltas_app/provider/favorites_provider.dart';
@@ -173,7 +174,7 @@ class ProductPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Главная / Каталог / ${123}',
+                          'Главная / Каталог / ${product.category_name}',
                           style: TextStyle(
                             color: newBlack54,
                             fontSize: 15,
@@ -186,30 +187,45 @@ class ProductPage extends StatelessWidget {
                           builder: (context, setState) => Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              AspectRatio(
-                                aspectRatio: 4 / 3,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: CachedNetworkImage(
-                                    filterQuality: FilterQuality.high,
-                                    fadeInDuration: const Duration(seconds: 0),
-                                    fadeOutDuration: const Duration(seconds: 0),
-                                    imageUrl:
-                                        product.images?[currentImage] ?? '',
-                                    fit: BoxFit.cover,
-                                    progressIndicatorBuilder:
-                                        (context, url, progress) => Container(
-                                      color: Colors.grey.shade200,
-                                      height: double.infinity,
-                                      width: double.infinity,
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => FullScreenImage(
+                                        imageUrl:
+                                            product.images?[currentImage] ?? '',
+                                      ),
                                     ),
-                                    errorWidget: (context, url, error) {
-                                      return Container(
+                                  );
+                                },
+                                child: AspectRatio(
+                                  aspectRatio: 4 / 3,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: CachedNetworkImage(
+                                      filterQuality: FilterQuality.high,
+                                      fadeInDuration:
+                                          const Duration(seconds: 0),
+                                      fadeOutDuration:
+                                          const Duration(seconds: 0),
+                                      imageUrl:
+                                          product.images?[currentImage] ?? '',
+                                      fit: BoxFit.cover,
+                                      progressIndicatorBuilder:
+                                          (context, url, progress) => Container(
                                         color: Colors.grey.shade200,
                                         height: double.infinity,
                                         width: double.infinity,
-                                      );
-                                    },
+                                      ),
+                                      errorWidget: (context, url, error) {
+                                        return Container(
+                                          color: Colors.grey.shade200,
+                                          height: double.infinity,
+                                          width: double.infinity,
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ),
                               ),
@@ -245,6 +261,13 @@ class ProductPage extends StatelessWidget {
                                             fit: BoxFit.cover,
                                             progressIndicatorBuilder:
                                                 (context, url, progress) {
+                                              return Container(
+                                                color: Colors.grey.shade200,
+                                                height: double.infinity,
+                                                width: double.infinity,
+                                              );
+                                            },
+                                            errorWidget: (context, url, error) {
                                               return Container(
                                                 color: Colors.grey.shade200,
                                                 height: double.infinity,

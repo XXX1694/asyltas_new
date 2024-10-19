@@ -116,7 +116,7 @@ class _CatalogScreenState extends State<CatalogScreen>
   void showCustomSnackBar(BuildContext context, String message) {
     final overlay = Overlay.of(context);
     final animationController = AnimationController(
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 100),
       vsync: this,
     );
     final animation = Tween<Offset>(
@@ -124,7 +124,7 @@ class _CatalogScreenState extends State<CatalogScreen>
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: animationController,
-      curve: Curves.easeOut,
+      curve: Curves.easeIn,
     ));
 
     final overlayEntry = OverlayEntry(
@@ -160,7 +160,7 @@ class _CatalogScreenState extends State<CatalogScreen>
     overlay.insert(overlayEntry);
     animationController.forward();
 
-    Future.delayed(const Duration(milliseconds: 1000), () {
+    Future.delayed(const Duration(milliseconds: 100), () {
       animationController.reverse().then((value) {
         overlayEntry.remove();
         animationController.dispose();

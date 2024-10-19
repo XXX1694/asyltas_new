@@ -265,6 +265,13 @@ class _CartMobileState extends State<CartMobile> with TickerProviderStateMixin {
                                               width: double.infinity,
                                             );
                                           },
+                                          errorWidget: (context, url, error) {
+                                            return Container(
+                                              color: Colors.grey.shade200,
+                                              height: double.infinity,
+                                              width: double.infinity,
+                                            );
+                                          },
                                         ),
                                       ),
                                     ),

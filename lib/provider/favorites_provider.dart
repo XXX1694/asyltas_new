@@ -53,6 +53,7 @@ class FavoritesProvider with ChangeNotifier {
         product.numberLeft,
         product.price,
         1, // Default count to 1 if creating a new item
+        product.itemLeft,
       ),
     );
 
@@ -76,6 +77,7 @@ class FavoritesProvider with ChangeNotifier {
         product.numberLeft,
         product.price,
         1, // Default count to 1 if creating a new item
+        product.itemLeft,
       ),
     );
 

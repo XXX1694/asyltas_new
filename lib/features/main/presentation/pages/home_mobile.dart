@@ -5,6 +5,7 @@ import 'package:asyltas_app/features/main/presentation/bloc/catalog_bloc.dart';
 import 'package:asyltas_app/features/main/presentation/widgets/catalog_layout.dart';
 import 'package:asyltas_app/features/main/presentation/widgets/corusel.dart';
 import 'package:asyltas_app/features/main/presentation/widgets/home_bottom.dart';
+import 'package:asyltas_app/features/main/presentation/widgets/search_field.dart';
 import 'package:asyltas_app/features/main/presentation/widgets/shop_widget.dart';
 import 'package:asyltas_app/features/menu/presentation/pages/menu_page.dart';
 import 'package:asyltas_app/provider/cart_provider.dart';
@@ -24,35 +25,40 @@ class HomeMobile extends StatefulWidget {
 class _HomeMobileState extends State<HomeMobile> {
   final catalogScrollController = ScrollController();
   final mainScrollController = ScrollController();
-  bool _showBackToTopButton =
-      false; // Добавляем переменную для видимости кнопки
+  bool _showBackToTopButton = true;
 
   @override
   void initState() {
     super.initState();
-    catalogScrollController
-        .addListener(_scrollListener); // Добавляем слушатель прокрутки
+    mainScrollController.addListener(_mainScrollListener);
+    catalogScrollController.addListener(_catalogScrollListener);
   }
 
   @override
   void dispose() {
-    catalogScrollController
-        .removeListener(_scrollListener); // Удаляем слушатель
-    catalogScrollController.dispose(); // Освобождаем контроллер
+    mainScrollController.removeListener(_mainScrollListener);
+    catalogScrollController.removeListener(_catalogScrollListener);
+    catalogScrollController.dispose();
     super.dispose();
   }
 
-  void _scrollListener() {
-    if (catalogScrollController.offset >= 200) {
-      // Если прокручено более 200 пикселей, показываем кнопку
+  void _mainScrollListener() {
+    if (mainScrollController.offset >= 30) {
+      setState(() {
+        _showBackToTopButton = true;
+      });
+    }
+  }
+
+  void _catalogScrollListener() {
+    if (catalogScrollController.offset >= 30) {
       setState(() {
         _showBackToTopButton = true;
       });
     } else {
-      // Иначе скрываем кнопку
-      setState(() {
-        _showBackToTopButton = false;
-      });
+      // setState(() {
+      //   _showBackToTopButton = false;
+      // });
     }
   }
 
@@ -65,6 +71,7 @@ class _HomeMobileState extends State<HomeMobile> {
         ),
       ],
       child: Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: newWhite,
         body: SafeArea(
           child: Stack(
@@ -94,15 +101,15 @@ class _HomeMobileState extends State<HomeMobile> {
                               textAlign: TextAlign.center,
                             ),
                             const Spacer(),
-                            GestureDetector(
-                              onTap: () {},
-                              child: SvgPicture.asset(
-                                'assets/search.svg',
-                                height: 24,
-                                width: 24,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
+                            // GestureDetector(
+                            //   onTap: () {},
+                            //   child: SvgPicture.asset(
+                            //     'assets/search.svg',
+                            //     height: 24,
+                            //     width: 24,
+                            //   ),
+                            // ),
+                            // const SizedBox(width: 16),
                             GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -181,7 +188,9 @@ class _HomeMobileState extends State<HomeMobile> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 4),
+                    const SearchField(),
+                    const SizedBox(height: 12),
                     const CustomCarousel(),
                     const SizedBox(height: 20),
                     const ShopWidget(),
@@ -197,7 +206,7 @@ class _HomeMobileState extends State<HomeMobile> {
               Align(
                 alignment: Alignment.bottomRight,
                 child: Container(
-                  margin: const EdgeInsets.only(right: 24, bottom: 28),
+                  margin: const EdgeInsets.only(right: 20, bottom: 64),
                   child: GestureDetector(
                     onTap: () {
                       Navigator.push(
@@ -275,12 +284,27 @@ class _HomeMobileState extends State<HomeMobile> {
               ),
               if (_showBackToTopButton)
                 Positioned(
-                  bottom: 80,
-                  right: 16,
-                  child: FloatingActionButton(
-                    onPressed: _scrollToTop,
-                    backgroundColor: Colors.blue, // Задайте нужный цвет
-                    child: const Icon(Icons.arrow_upward),
+                  bottom: 124,
+                  right: 20,
+                  child: GestureDetector(
+                    onTap: _scrollToTop,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            offset: const Offset(5, 5),
+                            blurRadius: 15,
+                            color: Colors.black.withOpacity(0.1),
+                          ),
+                        ],
+                      ),
+                      width: 52,
+                      height: 52,
+                      padding: const EdgeInsets.all(5),
+                      child: const Icon(Icons.arrow_upward),
+                    ),
                   ),
                 ),
             ],

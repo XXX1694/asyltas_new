@@ -1,7 +1,9 @@
 import 'package:asyltas_app/core/constants.dart';
 import 'package:asyltas_app/features/cart/presentation/pages/cart_page.dart';
+import 'package:asyltas_app/features/catalog/presentation/pages/catalog_page.dart';
 import 'package:asyltas_app/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:asyltas_app/features/main/presentation/pages/home_page.dart';
+import 'package:asyltas_app/features/main/presentation/widgets/categories_panel.dart';
 import 'package:asyltas_app/features/main/presentation/widgets/home_bottom.dart';
 import 'package:asyltas_app/features/menu/presentation/pages/menu_page.dart';
 import 'package:asyltas_app/provider/cart_provider.dart';
@@ -12,7 +14,7 @@ import 'package:provider/provider.dart';
 
 import '../widgets/catalog_category_layout.dart';
 
-class CategoryMobile extends StatelessWidget {
+class CategoryMobile extends StatefulWidget {
   const CategoryMobile({
     super.key,
     required this.categoryId,
@@ -22,8 +24,33 @@ class CategoryMobile extends StatelessWidget {
   final String categoryId;
 
   @override
+  State<CategoryMobile> createState() => _CategoryMobileState();
+}
+
+class _CategoryMobileState extends State<CategoryMobile> {
+  final mainScrollController = ScrollController();
+  @override
+  void initState() {
+    mainScrollController.addListener(_mainScrollListener);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    mainScrollController.removeListener(_mainScrollListener);
+    super.dispose();
+  }
+
+  void _mainScrollListener() {
+    if (mainScrollController.offset >= 30) {
+      setState(() {});
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: newWhite,
       body: SafeArea(
         child: Stack(
@@ -48,6 +75,7 @@ class CategoryMobile extends StatelessWidget {
                                 GestureDetector(
                                   onTap: () {
                                     Navigator.pop(context);
+                                    openDropdown();
                                   },
                                   child: SvgPicture.asset('assets/back.svg'),
                                 ),
@@ -148,6 +176,7 @@ class CategoryMobile extends StatelessWidget {
                                   ),
                                   (context) => false,
                                 );
+                                openDropdown();
                               },
                               child: const Text(
                                 'ASYLTAS',
@@ -170,7 +199,7 @@ class CategoryMobile extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                     child: Text(
-                      'Главная / Каталог / $categoryName',
+                      'Главная / Каталог / ${widget.categoryName}',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -184,7 +213,8 @@ class CategoryMobile extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                     child: CatalogCategoryLayout(
-                      categoryId: categoryId,
+                      categoryId: widget.categoryId,
+                      controller: mainScrollController,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -195,7 +225,7 @@ class CategoryMobile extends StatelessWidget {
             Align(
               alignment: Alignment.bottomRight,
               child: Container(
-                margin: const EdgeInsets.only(right: 24, bottom: 28),
+                margin: const EdgeInsets.only(right: 20, bottom: 64),
                 child: GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -269,10 +299,76 @@ class CategoryMobile extends StatelessWidget {
                   ),
                 ),
               ),
-            )
+            ),
+            Positioned(
+              bottom: 124,
+              right: 20,
+              child: GestureDetector(
+                onTap: _scrollToTop,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        offset: const Offset(5, 5),
+                        blurRadius: 15,
+                        color: Colors.black.withOpacity(0.1),
+                      ),
+                    ],
+                  ),
+                  width: 52,
+                  height: 52,
+                  padding: const EdgeInsets.all(5),
+                  child: const Icon(Icons.arrow_upward),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 64,
+              left: 20,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                  openDropdown();
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        offset: const Offset(5, 5),
+                        blurRadius: 15,
+                        color: Colors.black.withOpacity(0.1),
+                      ),
+                    ],
+                  ),
+                  // width: 52,
+                  height: 52,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.arrow_back),
+                      SizedBox(width: 8),
+                      Text('Назад'),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  void _scrollToTop() {
+    mainScrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
     );
   }
 }

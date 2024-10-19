@@ -17,16 +17,31 @@ class HomeBottom extends StatelessWidget {
             padding: const EdgeInsets.all(24),
             child: Row(
               children: [
-                const Text(
-                  'Северное кольцо 23, Алатау 4 блок',
-                  style: TextStyle(
-                    fontFamily: 'Gilroy',
-                    color: newWhite,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400,
-                    letterSpacing: -0.41,
+                CupertinoButton(
+                  padding: const EdgeInsets.all(0),
+                  onPressed: () async {
+                    const url =
+                        'https://2gis.kz/almaty/geo/70000001025719705/76.892922,43.292601';
+                    if (await canLaunchUrl(Uri.parse(url))) {
+                      await launchUrl(
+                        Uri.parse(url),
+                        mode: LaunchMode.externalApplication,
+                      );
+                    } else {
+                      throw 'Could not launch $url';
+                    }
+                  },
+                  child: const Text(
+                    'Северное кольцо 23, Алатау 4 блок',
+                    style: TextStyle(
+                      fontFamily: 'Gilroy',
+                      color: newWhite,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: -0.41,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
                 const Spacer(),
                 CupertinoButton(

@@ -2,6 +2,7 @@ import 'package:asyltas_app/core/constants.dart';
 import 'package:asyltas_app/core/models/product.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 typedef FutureCallbackFunction = Future Function({
   required ProductModel product,
@@ -72,6 +73,13 @@ class OtherProducts extends StatelessWidget {
                             child: CachedNetworkImage(
                               imageUrl: products[index].images?[0] ?? '',
                               fit: BoxFit.cover,
+                              errorWidget: (context, url, error) {
+                                return Container(
+                                  color: Colors.grey.shade200,
+                                  height: double.infinity,
+                                  width: double.infinity,
+                                );
+                              },
                             ),
                           ),
                         ),

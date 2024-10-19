@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import '../../../../core/constants.dart';
 
@@ -18,57 +19,42 @@ class CategoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Opacity(
-      opacity: isSelected ? 1 : 0.54,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 4,
-          ),
-          decoration: BoxDecoration(
-            color: secondMain,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                text,
-                style: const TextStyle(
-                  fontFamily: 'Gilroy',
-                  color: newWhite,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              count != null
-                  ? const Text(
-                      ' - ',
-                      style: TextStyle(
-                        fontFamily: 'Gilroy',
-                        color: newWhite,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    )
-                  : const SizedBox(),
-              count != null
-                  ? Text(
-                      count.toString(),
-                      style: const TextStyle(
-                        fontFamily: 'Gilroy',
-                        color: newWhite,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    )
-                  : const SizedBox(),
-            ],
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          text,
+          style: TextStyle(
+            fontFamily: 'Gilroy',
+            color: isSelected ? newBlack : newBlack.withOpacity(0.54),
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
           ),
         ),
-      ),
+        const Spacer(),
+        count != null && text != 'Все'
+            ? Text(
+                count.toString(),
+                style: TextStyle(
+                  fontFamily: 'Gilroy',
+                  color: isSelected ? newBlack : newBlack.withOpacity(0.54),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                ),
+              )
+            : const SizedBox(),
+        count != null && text != 'Все'
+            ? Text(
+                'шт',
+                style: TextStyle(
+                  fontFamily: 'Gilroy',
+                  color: isSelected ? newBlack : newBlack.withOpacity(0.54),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                ),
+              )
+            : const SizedBox(),
+      ],
     );
   }
 }

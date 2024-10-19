@@ -32,6 +32,7 @@ class _CatalogItemState extends State<CatalogItem> {
   //   super.initState();
   // }
   late TextEditingController itemCount;
+  int currentCount = 0;
   @override
   void initState() {
     itemCount = TextEditingController();
@@ -41,7 +42,7 @@ class _CatalogItemState extends State<CatalogItem> {
 
   @override
   Widget build(BuildContext context) {
-    int currentCount = widget.item.count ?? 0;
+    currentCount = widget.item.count ?? 0;
     itemCount.text = currentCount.toString();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -49,14 +50,17 @@ class _CatalogItemState extends State<CatalogItem> {
         CupertinoButton(
           padding: const EdgeInsets.all(0),
           onPressed: () async {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProductPage(
-                  product: widget.item,
+            if (widget.item.itemLeft == null || widget.item.itemLeft == 0) {
+            } else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProductPage(
+                    product: widget.item,
+                  ),
                 ),
-              ),
-            );
+              );
+            }
           },
           child: Stack(
             children: [
@@ -75,6 +79,13 @@ class _CatalogItemState extends State<CatalogItem> {
                       imageUrl: widget.item.images?[0] ?? '',
                       fit: BoxFit.cover,
                       progressIndicatorBuilder: (context, url, progress) {
+                        return Container(
+                          color: Colors.grey.shade200,
+                          height: double.infinity,
+                          width: double.infinity,
+                        );
+                      },
+                      errorWidget: (context, url, error) {
                         return Container(
                           color: Colors.grey.shade200,
                           height: double.infinity,
@@ -110,7 +121,10 @@ class _CatalogItemState extends State<CatalogItem> {
                         ),
                         child: Center(
                           child: Text(
-                            "${widget.item.numberLeft ?? 0} шт",
+                            widget.item.itemLeft == null ||
+                                    widget.item.itemLeft == 0
+                                ? 'Нет в наличии'
+                                : "${widget.item.numberLeft ?? 0} шт",
                             maxLines: 1,
                             style: const TextStyle(
                               color: newBlack,
@@ -158,14 +172,17 @@ class _CatalogItemState extends State<CatalogItem> {
             CupertinoButton(
               padding: const EdgeInsets.all(0),
               onPressed: () async {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProductPage(
-                      product: widget.item,
+                if (widget.item.itemLeft == null || widget.item.itemLeft == 0) {
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProductPage(
+                        product: widget.item,
+                      ),
                     ),
-                  ),
-                );
+                  );
+                }
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -197,115 +214,363 @@ class _CatalogItemState extends State<CatalogItem> {
             ),
             const SizedBox(height: 4),
             // Счетчик с кнопками "+" и "-"
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Кнопка "-"
-                CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: currentCount > 0
-                      ? () {
-                          context
-                              .read<CartProvider>()
-                              .decrementCount(widget.item);
-                          if (currentCount - 1 == 0) {
-                            widget.showCustomSnackBar!(
-                                context, 'Удалено из корзины!');
-                          } else {
-                            // widget.showCustomSnackBar!(context,
-                            //     'Количество уменьшено: ${currentCount - 1}');
-                            int totalPrice =
-                                context.read<CartProvider>().totalPrice;
-                            showTotalPriceSnackBar(
-                              context,
-                              totalPrice.toDouble(),
-                            );
-                          }
-                          setState(() {});
-                        }
-                      : null,
-                  child: Icon(
-                    Icons.remove,
-                    color: currentCount > 0 ? newBlack : Colors.grey,
-                  ),
-                ),
-                // Отображение текущего количества
-                SizedBox(
-                  width: 40,
-                  child: TextField(
-                    textAlign: TextAlign.center,
-                    controller: itemCount,
-                    style: const TextStyle(
+            widget.item.itemLeft == null || widget.item.itemLeft == 0
+                ? const Text(
+                    'Нет в наличии',
+                    maxLines: 1,
+                    style: TextStyle(
                       fontFamily: 'Gilroy',
                       color: newBlack,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      labelStyle: TextStyle(
-                        fontFamily: 'Gilroy',
-                        color: newBlack,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
+                    textAlign: TextAlign.center,
+                    // overflow: TextOverflow.ellipsis,
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Кнопка "-"
+                      CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: currentCount > 0
+                            ? () {
+                                context
+                                    .read<CartProvider>()
+                                    .decrementCount(widget.item);
+                                if (currentCount - 1 == 0) {
+                                  widget.showCustomSnackBar!(
+                                      context, 'Удалено из корзины!');
+                                } else {
+                                  // widget.showCustomSnackBar!(context,
+                                  //     'Количество уменьшено: ${currentCount - 1}');
+                                  int totalPrice =
+                                      context.read<CartProvider>().totalPrice;
+                                  showTotalPriceSnackBar(
+                                    context,
+                                    totalPrice.toDouble(),
+                                  );
+                                }
+                                setState(() {});
+                              }
+                            : null,
+                        child: Icon(
+                          Icons.remove,
+                          color: currentCount > 0 ? newBlack : Colors.grey,
+                        ),
                       ),
-                      hintStyle: TextStyle(
-                        fontFamily: 'Gilroy',
-                        color: newBlack,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
+                      // Отображение текущего количества
+                      CupertinoButton(
+                        padding: const EdgeInsets.all(0),
+                        child: Text(
+                          itemCount.text,
+                          style: const TextStyle(
+                            fontFamily: 'Gilroy',
+                            color: newBlack,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        onPressed: () {
+                          // openBottomSheet(context);
+                          openDialog(context);
+                        },
                       ),
-                    ),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
+                      // SizedBox(
+                      //   width: 40,
+                      //   child: TextFormField(
+                      //     maxLines: 1,
+                      //     textAlign: TextAlign.center,
+                      //     controller: itemCount,
+                      //     style: const TextStyle(
+                      //       fontFamily: 'Gilroy',
+                      //       color: newBlack,
+                      //       fontSize: 15,
+                      //       fontWeight: FontWeight.w600,
+                      //     ),
+                      //     decoration: const InputDecoration(
+                      //       border: InputBorder.none,
+                      //       labelStyle: TextStyle(
+                      //         fontFamily: 'Gilroy',
+                      //         color: newBlack,
+                      //         fontSize: 15,
+                      //         fontWeight: FontWeight.w600,
+                      //       ),
+                      //       hintStyle: TextStyle(
+                      //         fontFamily: 'Gilroy',
+                      //         color: newBlack,
+                      //         fontSize: 15,
+                      //         fontWeight: FontWeight.w600,
+                      //       ),
+                      //     ),
+                      //     keyboardType: TextInputType.number,
+                      //     inputFormatters: <TextInputFormatter>[
+                      //       FilteringTextInputFormatter.digitsOnly
+                      //     ],
+                      //     onFieldSubmitted: (value) async {
+                      //       currentCount = int.parse(value);
+                      //       widget.item.count = currentCount;
+                      //       context
+                      //           .read<CartProvider>()
+                      //           .updateItem(widget.item);
+                      //       int totalPrice =
+                      //           context.read<CartProvider>().totalPrice;
+                      //       showTotalPriceSnackBar(
+                      //         context,
+                      //         totalPrice.toDouble(),
+                      //       );
+                      //     },
+                      //   ),
+                      // ),
+                      // Padding(
+                      //   padding: const EdgeInsets.symmetric(horizontal: 12),
+                      //   child: Text(
+                      //     '$currentCount',
+                      //     style: const TextStyle(
+                      //       fontFamily: 'Gilroy',
+                      //       color: newBlack,
+                      //       fontSize: 15,
+                      //       fontWeight: FontWeight.w600,
+                      //     ),
+                      //   ),
+                      // ),
+                      // Кнопка "+"
+                      CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          context
+                              .read<CartProvider>()
+                              .incrementCount(widget.item);
+                          int totalPrice =
+                              context.read<CartProvider>().totalPrice;
+                          showTotalPriceSnackBar(
+                            context,
+                            totalPrice.toDouble(),
+                          );
+                          setState(() {});
+                        },
+                        child: const Icon(
+                          Icons.add,
+                          color: newBlack,
+                        ),
+                      ),
                     ],
-                    onSubmitted: (value) {
-                      currentCount = int.parse(value);
-                      widget.item.count = currentCount;
-                      context.read<CartProvider>().updateItem(widget.item);
-                      int totalPrice = context.read<CartProvider>().totalPrice;
-                      showTotalPriceSnackBar(
-                        context,
-                        totalPrice.toDouble(),
-                      );
-                    },
                   ),
-                ),
-                // Padding(
-                //   padding: const EdgeInsets.symmetric(horizontal: 12),
-                //   child: Text(
-                //     '$currentCount',
-                //     style: const TextStyle(
-                //       fontFamily: 'Gilroy',
-                //       color: newBlack,
-                //       fontSize: 15,
-                //       fontWeight: FontWeight.w600,
-                //     ),
-                //   ),
-                // ),
-                // Кнопка "+"
-                CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () {
-                    context.read<CartProvider>().incrementCount(widget.item);
-                    int totalPrice = context.read<CartProvider>().totalPrice;
-                    showTotalPriceSnackBar(
-                      context,
-                      totalPrice.toDouble(),
-                    );
-                    setState(() {});
-                  },
-                  child: const Icon(
-                    Icons.add,
-                    color: newBlack,
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
       ],
+    );
+  }
+
+  void openBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: double.infinity,
+                child: TextFormField(
+                  maxLines: 1,
+                  textAlign: TextAlign.center,
+                  controller: itemCount,
+                  style: const TextStyle(
+                    fontFamily: 'Gilroy',
+                    color: Colors.black,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  decoration: const InputDecoration(
+                    // border: InputBorder.none,
+                    labelStyle: TextStyle(
+                      fontFamily: 'Gilroy',
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    hintStyle: TextStyle(
+                      fontFamily: 'Gilroy',
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              CupertinoButton(
+                padding: const EdgeInsets.all(0),
+                onPressed: () {},
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: secondMain,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        offset: const Offset(5, 5),
+                        blurRadius: 15,
+                        color: Colors.black.withOpacity(0.1),
+                      ),
+                    ],
+                  ),
+                  height: 32,
+                  width: double.infinity,
+                  child: const Center(
+                    child: Text(
+                      'Подтвердить',
+                      style: TextStyle(
+                        fontFamily: 'Gilroy',
+                        color: newWhite,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void openDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Введите количество'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  maxLines: 1,
+                  textAlign: TextAlign.center,
+                  controller: itemCount,
+                  style: const TextStyle(
+                    fontFamily: 'Gilroy',
+                    color: Colors.black,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  decoration: const InputDecoration(
+                    labelStyle: TextStyle(
+                      fontFamily: 'Gilroy',
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    hintStyle: TextStyle(
+                      fontFamily: 'Gilroy',
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            CupertinoButton(
+              padding: const EdgeInsets.all(0),
+              onPressed: () {
+                currentCount = int.parse(itemCount.text);
+                // Assuming widget.item.count is something you want to update
+                widget.item.count = currentCount;
+
+                // Assuming you're using a CartProvider to update and fetch data
+                context.read<CartProvider>().updateItem(widget.item);
+                int totalPrice = context.read<CartProvider>().totalPrice;
+
+                // Function to show total price snack bar
+                showTotalPriceSnackBar(
+                  context,
+                  totalPrice.toDouble(),
+                );
+                Navigator.pop(context); // Close the bottom sheet
+                setState(() {});
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: newMainColor,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      offset: const Offset(5, 5),
+                      blurRadius: 15,
+                      color: Colors.black.withOpacity(0.1),
+                    ),
+                  ],
+                ),
+                height: 32,
+                width: double.infinity,
+                child: const Center(
+                  child: Text(
+                    'Подтвердить',
+                    style: TextStyle(
+                      fontFamily: 'Gilroy',
+                      color: newWhite,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            CupertinoButton(
+              padding: const EdgeInsets.all(0),
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog without changes
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: secondMain,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      offset: const Offset(5, 5),
+                      blurRadius: 15,
+                      color: Colors.black.withOpacity(0.1),
+                    ),
+                  ],
+                ),
+                height: 32,
+                width: double.infinity,
+                child: const Center(
+                  child: Text(
+                    'Отмена',
+                    style: TextStyle(
+                      fontFamily: 'Gilroy',
+                      color: newWhite,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 

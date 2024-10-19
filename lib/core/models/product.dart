@@ -16,6 +16,7 @@ class ProductModel {
   final String? category_name;
   final String? category_id;
   int? count;
+  int? itemLeft;
   ProductModel(
     this.id,
     this.name,
@@ -26,6 +27,7 @@ class ProductModel {
     this.numberLeft,
     this.price,
     this.count,
+    this.itemLeft,
   );
   factory ProductModel.fromJson(Map<String, dynamic> json) =>
       _$ProductModelFromJson(json);

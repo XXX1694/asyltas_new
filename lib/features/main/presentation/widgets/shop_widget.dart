@@ -13,7 +13,7 @@ class ShopWidget extends StatelessWidget {
         height: 40,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: newMainColor,
+          color: secondMain,
           borderRadius: BorderRadius.circular(12),
         ),
         child: const Center(

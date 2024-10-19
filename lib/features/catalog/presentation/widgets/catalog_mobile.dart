@@ -182,6 +182,13 @@ class _CatalogMobileState extends State<CatalogMobile>
                       width: double.infinity,
                     );
                   },
+                  errorWidget: (context, url, error) {
+                    return Container(
+                      color: Colors.grey.shade200,
+                      height: double.infinity,
+                      width: double.infinity,
+                    );
+                  },
                 ),
               ),
             ),
