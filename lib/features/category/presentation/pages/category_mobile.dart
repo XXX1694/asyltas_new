@@ -12,7 +12,7 @@ import 'package:provider/provider.dart';
 
 import '../widgets/catalog_category_layout.dart';
 
-class CategoryMobile extends StatelessWidget {
+class CategoryMobile extends StatefulWidget {
   const CategoryMobile({
     super.key,
     required this.categoryId,
@@ -22,6 +22,15 @@ class CategoryMobile extends StatelessWidget {
   final String categoryId;
 
   @override
+  State<CategoryMobile> createState() => _CategoryMobileState();
+}
+
+class _CategoryMobileState extends State<CategoryMobile> {
+
+  final ScrollController _scrollController = ScrollController();
+  final ScrollController _mainScrollController = ScrollController();
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: newWhite,
@@ -29,6 +38,7 @@ class CategoryMobile extends StatelessWidget {
         child: Stack(
           children: [
             SingleChildScrollView(
+              controller: _mainScrollController,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -169,7 +179,7 @@ class CategoryMobile extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                     child: Text(
-                      'Главная / Каталог / $categoryName',
+                      'Главная / Каталог / ${widget.categoryName}',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -183,7 +193,8 @@ class CategoryMobile extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
                     child: CatalogCategoryLayout(
-                      categoryId: categoryId,
+                      categoryId: widget.categoryId,
+                      scrollController: _scrollController,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -193,80 +204,126 @@ class CategoryMobile extends StatelessWidget {
             ),
             Align(
               alignment: Alignment.bottomRight,
-              child: Container(
-                margin: const EdgeInsets.only(right: 24, bottom: 28),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CartPage(),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          offset: const Offset(5, 5),
-                          blurRadius: 15,
-                          color: Colors.black.withOpacity(0.1),
-                        ),
-                      ],
-                    ),
-                    width: 52,
-                    height: 52,
-                    padding: const EdgeInsets.all(5),
-                    child: SizedBox(
-                      width: 31,
-                      height: 31,
-                      child: Stack(
-                        children: [
-                          Align(
-                            alignment: Alignment.center,
-                            child: SvgPicture.asset(
-                              'assets/cart1.svg',
-                            ),
-                          ),
-                          Consumer<CartProvider>(
-                            builder: (context, cart, child) {
-                              if (cart.items.isEmpty) {
-                                return const SizedBox();
-                              } else {
-                                return Align(
-                                  alignment: Alignment.topRight,
-                                  child: Container(
-                                    height: 18,
-                                    width: 18,
-                                    decoration: BoxDecoration(
-                                      color: newMainColor,
-                                      borderRadius: BorderRadius.circular(100),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        cart.items.length.toString(),
-                                        style: const TextStyle(
-                                          color: newWhite,
-                                          fontSize: 11,
-                                          fontFamily: 'Gilroy',
-                                          fontWeight: FontWeight.w500,
-                                          letterSpacing: 0,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }
-                            },
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      _mainScrollController.animateTo(
+                        0,
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                      );
+                      _scrollController.animateTo(
+                        0,
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                      );
+
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 24, bottom: 28),
+
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            offset: const Offset(5, 5),
+                            blurRadius: 15,
+                            color: Colors.black.withOpacity(0.1),
                           ),
                         ],
                       ),
+                      width: 52,
+                      height: 52,
+                      padding: const EdgeInsets.all(5),
+                      child: const SizedBox(
+                        width: 31,
+                        height: 31,
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Icon(Icons.arrow_upward),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  Container(
+                    margin: const EdgeInsets.only(right: 24, bottom: 28),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CartPage(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              offset: const Offset(5, 5),
+                              blurRadius: 15,
+                              color: Colors.black.withOpacity(0.1),
+                            ),
+                          ],
+                        ),
+                        width: 52,
+                        height: 52,
+                        padding: const EdgeInsets.all(5),
+                        child: SizedBox(
+                          width: 31,
+                          height: 31,
+                          child: Stack(
+                            children: [
+                              Align(
+                                alignment: Alignment.center,
+                                child: SvgPicture.asset(
+                                  'assets/cart1.svg',
+                                ),
+                              ),
+                              Consumer<CartProvider>(
+                                builder: (context, cart, child) {
+                                  if (cart.items.isEmpty) {
+                                    return const SizedBox();
+                                  } else {
+                                    return Align(
+                                      alignment: Alignment.topRight,
+                                      child: Container(
+                                        height: 18,
+                                        width: 18,
+                                        decoration: BoxDecoration(
+                                          color: newMainColor,
+                                          borderRadius: BorderRadius.circular(100),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            cart.items.length.toString(),
+                                            style: const TextStyle(
+                                              color: newWhite,
+                                              fontSize: 11,
+                                              fontFamily: 'Gilroy',
+                                              fontWeight: FontWeight.w500,
+                                              letterSpacing: 0,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             )
           ],

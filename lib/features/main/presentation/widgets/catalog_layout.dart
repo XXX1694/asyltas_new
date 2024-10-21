@@ -12,8 +12,11 @@ import 'categories_panel.dart';
 
 class CatalogLayout extends StatefulWidget {
   const CatalogLayout({
+    this.scrollController,
     super.key,
   });
+
+  final ScrollController? scrollController;
 
   @override
   State<CatalogLayout> createState() => _CatalogLayoutState();
@@ -51,7 +54,10 @@ class _CatalogLayoutState extends State<CatalogLayout> {
         children: [
           CategoriesPanel(controller: controller),
           const SizedBox(height: 20),
-          CatalogScreen(currentCategoryId: controller.value.id),
+          CatalogScreen(
+            scrollController: widget.scrollController,
+            currentCategoryId: controller.value.id,
+          ),
           const SizedBox(height: 16),
           CupertinoButton(
             padding: const EdgeInsets.all(0),
