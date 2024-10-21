@@ -54,7 +54,7 @@ class CategoryItem extends StatelessWidget {
                       ),
                     )
                   : const SizedBox(),
-              count != null
+              count != null && count != 0
                   ? Text(
                       count.toString(),
                       style: const TextStyle(
