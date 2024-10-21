@@ -43,7 +43,7 @@ class CategoryItem extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              count != null
+              count != null && count != 0
                   ? const Text(
                       ' - ',
                       style: TextStyle(
