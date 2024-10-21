@@ -68,7 +68,7 @@ class _CatalogLayoutState extends State<CatalogLayout> {
               ),
               child: const Center(
                 child: Text(
-                  'Все товары',
+                  'Все товары.',
                   style: TextStyle(
                     color: newMainColor,
                     fontFamily: 'Gilroy',
