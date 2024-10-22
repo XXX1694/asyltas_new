@@ -147,14 +147,13 @@ class _CategoryMobileState extends State<CategoryMobile> {
                                 const SizedBox(width: 10),
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.pushAndRemoveUntil(
+                                    Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => const MenuPage(
                                           fromMain: false,
                                         ),
                                       ),
-                                      (context) => false,
                                     );
                                   },
                                   child: SvgPicture.asset('assets/menu.svg'),
