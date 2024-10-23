@@ -55,11 +55,20 @@ class _HomeMobileState extends State<HomeMobile> {
       setState(() {
         _showBackToTopButton = true;
       });
-    } else {
-      // setState(() {
-      //   _showBackToTopButton = false;
-      // });
     }
+  }
+
+  void _scrollToTop() {
+    catalogScrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+    mainScrollController.animateTo(
+      0,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -83,110 +92,7 @@ class _HomeMobileState extends State<HomeMobile> {
                     const SizedBox(height: 20),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: SizedBox(
-                        height: 31,
-                        width: double.infinity,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            const Text(
-                              'ASYLTAS',
-                              style: TextStyle(
-                                color: newBlack,
-                                fontSize: 17,
-                                fontFamily: 'Gilroy',
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 1,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const Spacer(),
-                            // GestureDetector(
-                            //   onTap: () {},
-                            //   child: SvgPicture.asset(
-                            //     'assets/search.svg',
-                            //     height: 24,
-                            //     width: 24,
-                            //   ),
-                            // ),
-                            // const SizedBox(width: 16),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const FavoritesPage(
-                                      fromMain: true,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: SizedBox(
-                                width: 31,
-                                height: 31,
-                                child: Stack(
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.bottomLeft,
-                                      child: SvgPicture.asset(
-                                        'assets/menu_like.svg',
-                                      ),
-                                    ),
-                                    Consumer<FavoritesProvider>(
-                                      builder: (context, favorites, child) {
-                                        if (favorites.items.isEmpty) {
-                                          return const SizedBox();
-                                        } else {
-                                          return Align(
-                                            alignment: Alignment.topRight,
-                                            child: Container(
-                                              height: 16,
-                                              width: 16,
-                                              decoration: BoxDecoration(
-                                                color: newMainColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(100),
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  favorites.items.length
-                                                      .toString(),
-                                                  style: const TextStyle(
-                                                    color: newWhite,
-                                                    fontSize: 11,
-                                                    fontFamily: 'Gilroy',
-                                                    fontWeight: FontWeight.w500,
-                                                    letterSpacing: 0,
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      },
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const MenuPage(
-                                      fromMain: true,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: SvgPicture.asset('assets/menu.svg'),
-                            ),
-                          ],
-                        ),
-                      ),
+                      child: _buildHeader(),
                     ),
                     const SizedBox(height: 4),
                     const SearchField(),
@@ -203,110 +109,8 @@ class _HomeMobileState extends State<HomeMobile> {
                   ],
                 ),
               ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: Container(
-                  margin: const EdgeInsets.only(right: 20, bottom: 64),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const CartPage(),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            offset: const Offset(5, 5),
-                            blurRadius: 15,
-                            color: Colors.black.withOpacity(0.1),
-                          ),
-                        ],
-                      ),
-                      width: 52,
-                      height: 52,
-                      padding: const EdgeInsets.all(5),
-                      child: SizedBox(
-                        width: 31,
-                        height: 31,
-                        child: Stack(
-                          children: [
-                            Align(
-                              alignment: Alignment.center,
-                              child: SvgPicture.asset(
-                                'assets/cart1.svg',
-                              ),
-                            ),
-                            Consumer<CartProvider>(
-                              builder: (context, cart, child) {
-                                if (cart.items.isEmpty) {
-                                  return const SizedBox();
-                                } else {
-                                  return Align(
-                                    alignment: Alignment.topRight,
-                                    child: Container(
-                                      height: 18,
-                                      width: 18,
-                                      decoration: BoxDecoration(
-                                        color: newMainColor,
-                                        borderRadius:
-                                            BorderRadius.circular(100),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          cart.items.length.toString(),
-                                          style: const TextStyle(
-                                            color: newWhite,
-                                            fontSize: 11,
-                                            fontFamily: 'Gilroy',
-                                            fontWeight: FontWeight.w500,
-                                            letterSpacing: 0,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              if (_showBackToTopButton)
-                Positioned(
-                  bottom: 124,
-                  right: 20,
-                  child: GestureDetector(
-                    onTap: _scrollToTop,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            offset: const Offset(5, 5),
-                            blurRadius: 15,
-                            color: Colors.black.withOpacity(0.1),
-                          ),
-                        ],
-                      ),
-                      width: 52,
-                      height: 52,
-                      padding: const EdgeInsets.all(5),
-                      child: const Icon(Icons.arrow_upward),
-                    ),
-                  ),
-                ),
+              _buildCartButton(),
+              if (_showBackToTopButton) _buildScrollTOTopButton(),
             ],
           ),
         ),
@@ -314,16 +118,205 @@ class _HomeMobileState extends State<HomeMobile> {
     );
   }
 
-  void _scrollToTop() {
-    catalogScrollController.animateTo(
-      0,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
+  Widget _buildHeader() {
+    return SizedBox(
+      height: 31,
+      width: double.infinity,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          const Text(
+            'ASYLTAS',
+            style: TextStyle(
+              color: newBlack,
+              fontSize: 17,
+              fontFamily: 'Gilroy',
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const Spacer(),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const FavoritesPage(
+                    fromMain: true,
+                  ),
+                ),
+              );
+            },
+            child: SizedBox(
+              width: 31,
+              height: 31,
+              child: Stack(
+                children: [
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: SvgPicture.asset(
+                      'assets/menu_like.svg',
+                    ),
+                  ),
+                  Consumer<FavoritesProvider>(
+                    builder: (context, favorites, child) {
+                      if (favorites.items.isEmpty) {
+                        return const SizedBox();
+                      } else {
+                        return Align(
+                          alignment: Alignment.topRight,
+                          child: Container(
+                            height: 16,
+                            width: 16,
+                            decoration: BoxDecoration(
+                              color: newMainColor,
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                            child: Center(
+                              child: Text(
+                                favorites.items.length.toString(),
+                                style: const TextStyle(
+                                  color: newWhite,
+                                  fontSize: 11,
+                                  fontFamily: 'Gilroy',
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 0,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  )
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MenuPage(
+                    fromMain: true,
+                  ),
+                ),
+              );
+            },
+            child: SvgPicture.asset('assets/menu.svg'),
+          ),
+        ],
+      ),
     );
-    mainScrollController.animateTo(
-      0,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
+  }
+
+  Widget _buildCartButton() {
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CartPage(),
+            ),
+          );
+        },
+        child: Container(
+          margin: const EdgeInsets.only(right: 20, bottom: 64),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                offset: const Offset(5, 5),
+                blurRadius: 15,
+                color: Colors.black.withOpacity(0.1),
+              ),
+            ],
+          ),
+          width: 52,
+          height: 52,
+          padding: const EdgeInsets.all(5),
+          child: SizedBox(
+            width: 31,
+            height: 31,
+            child: Stack(
+              children: [
+                Align(
+                  alignment: Alignment.center,
+                  child: SvgPicture.asset(
+                    'assets/cart1.svg',
+                  ),
+                ),
+                Consumer<CartProvider>(
+                  builder: (context, cart, child) {
+                    if (cart.items.isEmpty) {
+                      return const SizedBox();
+                    } else {
+                      return Align(
+                        alignment: Alignment.topRight,
+                        child: Container(
+                          height: 18,
+                          width: 18,
+                          decoration: const BoxDecoration(
+                            color: newMainColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              cart.items.length.toString(),
+                              style: const TextStyle(
+                                color: newWhite,
+                                fontSize: 11,
+                                fontFamily: 'Gilroy',
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 0,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScrollTOTopButton() {
+    return Positioned(
+      bottom: 124,
+      right: 20,
+      child: GestureDetector(
+        onTap: _scrollToTop,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                offset: const Offset(5, 5),
+                blurRadius: 15,
+                color: Colors.black.withOpacity(0.1),
+              ),
+            ],
+          ),
+          width: 52,
+          height: 52,
+          padding: const EdgeInsets.all(5),
+          child: const Icon(Icons.arrow_upward),
+        ),
+      ),
     );
   }
 }

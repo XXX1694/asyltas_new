@@ -25,12 +25,6 @@ class CatalogItem extends StatefulWidget {
 }
 
 class _CatalogItemState extends State<CatalogItem> {
-  // int currentCount = 0;
-  // @override
-  // void initState() {
-  //   currentCount = widget.item.count ?? 0;
-  //   super.initState();
-  // }
   late TextEditingController itemCount;
   int currentCount = 0;
   @override
