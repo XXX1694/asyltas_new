@@ -50,6 +50,7 @@ class MainApp extends StatelessWidget {
       ],
       child: MaterialApp(
         scrollBehavior: MyScrollBehavior(),
+        title: 'Asyltas.kz - Ювелирный магазин',
         debugShowCheckedModeBanner: false,
         routes: {
           '/': (context) => const HomePage(),
