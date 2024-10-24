@@ -89,8 +89,9 @@ class _CatalogScreenState extends State<CatalogScreen>
                       context.watch<CartProvider>().firstWhereOrNull(
                             (cartItem) => cartItem.id == products[index].id,
                           );
-                  products[index].count = cartItem?.count ?? 0;
-                  final product = products[index];
+                  final product = products[index].copyWith(
+                    count: cartItem?.count ?? 0,
+                  );
                   return CatalogItem(
                     item: product,
                     showCustomSnackBar: showCustomSnackBar,

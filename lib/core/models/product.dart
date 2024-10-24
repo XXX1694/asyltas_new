@@ -17,6 +17,7 @@ class ProductModel {
   final String? category_id;
   int? count;
   int? itemLeft;
+
   ProductModel(
     this.id,
     this.name,
@@ -29,7 +30,35 @@ class ProductModel {
     this.count,
     this.itemLeft,
   );
+
   factory ProductModel.fromJson(Map<String, dynamic> json) =>
       _$ProductModelFromJson(json);
+
   Map<String, dynamic> toJson() => _$ProductModelToJson(this);
+
+  ProductModel copyWith({
+    String? id,
+    String? name,
+    int? numberLeft,
+    int? price,
+    List<String>? images,
+    String? description,
+    String? category_name,
+    String? category_id,
+    int? count,
+    int? itemLeft,
+  }) {
+    return ProductModel(
+      id ?? this.id,
+      name ?? this.name,
+      images ?? this.images,
+      category_id ?? this.category_id,
+      category_name ?? this.category_name,
+      description ?? this.description,
+      numberLeft ?? this.numberLeft,
+      price ?? this.price,
+      count ?? this.count,
+      itemLeft ?? this.itemLeft,
+    );
+  }
 }
