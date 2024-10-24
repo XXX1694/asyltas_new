@@ -1,6 +1,8 @@
+import 'package:asyltas_app/core/services/local_storage.dart';
 import 'package:asyltas_app/features/main/presentation/pages/home_page.dart';
 import 'package:asyltas_app/firebase_options.dart';
 import 'package:asyltas_app/provider/cart_provider.dart';
+import 'package:asyltas_app/provider/di_utils.dart';
 import 'package:asyltas_app/provider/favorites_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -36,8 +38,15 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => CartProvider()),
-        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+        Provider.value(value: LocalStorage()),
+        ChangeNotifierProvider(
+          create: (context) => CartProvider(
+            localStorage: provideOnce(context),
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => FavoritesProvider(),
+        ),
       ],
       child: MaterialApp(
         scrollBehavior: MyScrollBehavior(),

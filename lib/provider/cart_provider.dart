@@ -1,16 +1,21 @@
 import 'dart:convert';
+
 import 'package:asyltas_app/core/models/product.dart';
+import 'package:asyltas_app/core/services/local_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+const String _cartKey = 'asyltas.kz.cart';
 
 class CartProvider with ChangeNotifier {
+  CartProvider({required this.localStorage}) {
+    _loadCart();
+  }
+
+  final LocalStorage localStorage;
+
   List<ProductModel> _items = [];
 
   List<ProductModel> get items => _items;
-
-  CartProvider() {
-    _loadCart();
-  }
 
   // Метод для добавления товара в корзину
   bool addItem(ProductModel product) {
@@ -139,8 +144,8 @@ class CartProvider with ChangeNotifier {
   }
 
   Future<void> _loadCart() async {
-    final prefs = await SharedPreferences.getInstance();
-    final cartData = prefs.getString('cart');
+    await localStorage.init();
+    final cartData = localStorage.getString(_cartKey);
     if (cartData != null) {
       final List<dynamic> jsonList = json.decode(cartData);
       _items = jsonList.map((json) => ProductModel.fromJson(json)).toList();
@@ -149,9 +154,8 @@ class CartProvider with ChangeNotifier {
   }
 
   Future<void> _saveCart() async {
-    final prefs = await SharedPreferences.getInstance();
     final jsonList = _items.map((item) => item.toJson()).toList();
     final cartData = json.encode(jsonList);
-    prefs.setString('cart', cartData);
+    localStorage.putString(_cartKey, cartData);
   }
 }
