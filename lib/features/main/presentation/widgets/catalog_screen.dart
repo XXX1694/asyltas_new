@@ -1,4 +1,5 @@
 import 'package:asyltas_app/provider/cart_provider.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants.dart';
@@ -85,10 +86,11 @@ class _CatalogScreenState extends State<CatalogScreen>
               itemCount: state.hasNext ? products.length : products.length + 1,
               itemBuilder: (context, index) {
                 if (index < products.length) {
-                  final cartItem =
-                      context.watch<CartProvider>().firstWhereOrNull(
-                            (cartItem) => cartItem.id == products[index].id,
-                          );
+                  final cartItem = context
+                      .watch<CartProvider>()
+                      .items
+                      .firstWhereOrNull((e) => e.id == products[index].id);
+
                   final product = products[index].copyWith(
                     count: cartItem?.count ?? 0,
                   );

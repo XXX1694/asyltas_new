@@ -7,6 +7,7 @@ import 'package:asyltas_app/features/product/presentation/pages/product_page.dar
 import 'package:asyltas_app/provider/cart_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -242,10 +243,11 @@ class _MiniCatalogMobileState extends State<MiniCatalogMobile>
                         crossAxisSpacing: 12,
                         children: categoryProducts.map((item) {
                           // Проверяем, есть ли товар в корзине
-                          final cartItem =
-                              context.watch<CartProvider>().firstWhereOrNull(
-                                    (cartItem) => cartItem.id == item.id,
-                                  );
+                          final cartItem = context
+                              .watch<CartProvider>()
+                              .items
+                              .firstWhereOrNull(
+                                  (cartItem) => cartItem.id == item.id);
 
                           int currentCount = cartItem?.count ?? 0;
 

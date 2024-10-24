@@ -39,13 +39,6 @@ class CartProvider with ChangeNotifier {
     }
   }
 
-  ProductModel? firstWhereOrNull(bool Function(ProductModel item) test) {
-    for (var item in _items) {
-      if (test(item)) return item;
-    }
-    return null;
-  }
-
   // Метод для удаления товара из корзины
   void removeItem(ProductModel product) {
     _items.removeWhere((item) => item.id == product.id);
