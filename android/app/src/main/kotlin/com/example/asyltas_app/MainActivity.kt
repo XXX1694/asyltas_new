@@ -1,4 +1,4 @@
-package com.example.asyltas_app
+package com.asyltas.galab
 
 import io.flutter.embedding.android.FlutterActivity
 

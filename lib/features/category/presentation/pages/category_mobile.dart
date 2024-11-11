@@ -1,6 +1,5 @@
 import 'package:asyltas_app/core/constants.dart';
 import 'package:asyltas_app/features/cart/presentation/pages/cart_page.dart';
-import 'package:asyltas_app/features/catalog/presentation/pages/catalog_page.dart';
 import 'package:asyltas_app/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:asyltas_app/features/main/presentation/pages/home_page.dart';
 import 'package:asyltas_app/features/main/presentation/widgets/categories_panel.dart';
