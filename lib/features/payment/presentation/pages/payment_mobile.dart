@@ -5,9 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../widgets/comment.dart';
+
 class PaymentMobile extends StatelessWidget {
-  const PaymentMobile({super.key, required this.price});
+  const PaymentMobile({
+    super.key,
+    required this.price,
+    required this.name,
+  });
   final int price;
+  final String name;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -150,6 +157,10 @@ class PaymentMobile extends StatelessWidget {
                           ),
                         ),
                       ),
+                    ),
+                    const SizedBox(height: 40),
+                    CommentTextField(
+                      name: name,
                     ),
                   ],
                 ),

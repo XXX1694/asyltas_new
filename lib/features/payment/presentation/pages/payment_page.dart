@@ -6,16 +6,20 @@ class PaymentPage extends StatelessWidget {
   const PaymentPage({
     super.key,
     required this.price,
+    required this.name,
   });
   final int price;
+  final String name;
   @override
   Widget build(BuildContext context) {
     return ResponsiveLayout(
       desktopLayout: PaymentMobile(
         price: price,
+        name: name,
       ),
       mobileLayout: PaymentMobile(
         price: price,
+        name: name,
       ),
     );
   }

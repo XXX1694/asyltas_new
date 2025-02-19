@@ -200,6 +200,9 @@ class _CartMobileState extends State<CartMobile> with TickerProviderStateMixin {
             Expanded(
               child: Consumer<CartProvider>(
                 builder: (context, cart, child) {
+                  final total = cart.totalPrice;
+                  final discountedTotal =
+                      total >= 50000 ? (total * 0.95).round() : total;
                   if (cart.items.isEmpty) {
                     return const Column(
                       children: [
@@ -304,36 +307,14 @@ class _CartMobileState extends State<CartMobile> with TickerProviderStateMixin {
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           const SizedBox(height: 16),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                '${cart.items[index].price! * cart.items[index].count!} ₸ ',
-                                                style: TextStyle(
-                                                  fontFamily: 'Gilroy',
-                                                  color: newBlack,
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500,
-                                                  decoration: cart.items[index]
-                                                              .count! >=
-                                                          10
-                                                      ? TextDecoration
-                                                          .lineThrough
-                                                      : null,
-                                                ),
-                                              ),
-                                              cart.items[index].count! >= 10
-                                                  ? Text(
-                                                      '(${(cart.items[index].price! * (cart.items[index].count! >= 20 ? 0.8 : cart.items[index].count! >= 10 ? 0.9 : 1.0)) * cart.items[index].count!} ₸)',
-                                                      style: const TextStyle(
-                                                        fontFamily: 'Gilroy',
-                                                        color: newMainColor,
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                    )
-                                                  : const SizedBox(),
-                                            ],
+                                          Text(
+                                            '${cart.items[index].price! * cart.items[index].count!} ₸ ',
+                                            style: const TextStyle(
+                                              fontFamily: 'Gilroy',
+                                              color: newBlack,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                            ),
                                           ),
                                           const Spacer(),
                                           Row(
@@ -468,11 +449,23 @@ class _CartMobileState extends State<CartMobile> with TickerProviderStateMixin {
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
+                              if (total >= 50000)
+                                Text(
+                                  '$total ₸ ',
+                                  style: const TextStyle(
+                                    decoration: TextDecoration.lineThrough,
+                                    fontFamily: 'Gilroy',
+                                    color: newBlack,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                               Text(
-                                "${context.read<CartProvider>().totalPrice} ₸",
-                                style: const TextStyle(
+                                '$discountedTotal ₸',
+                                style: TextStyle(
                                   fontFamily: 'Gilroy',
-                                  color: newBlack,
+                                  color:
+                                      total >= 50000 ? newMainColor : newBlack,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -495,9 +488,13 @@ class _CartMobileState extends State<CartMobile> with TickerProviderStateMixin {
                           child: CupertinoButton(
                             padding: const EdgeInsets.all(0),
                             onPressed: () async {
-                              int total =
-                                  context.read<CartProvider>().totalPrice;
-                              if (total < 10000) {
+                              final cart = context.read<CartProvider>();
+                              final total = cart.totalPrice;
+                              final discountedTotal = total >= 50000
+                                  ? (total * 0.95).round()
+                                  : total;
+
+                              if (discountedTotal < 10000) {
                                 showCustomSnackBar(context,
                                     'Минимальная сумма заказа 10,000₸');
                               } else {
@@ -519,14 +516,16 @@ class _CartMobileState extends State<CartMobile> with TickerProviderStateMixin {
                                         : commentContrller.text,
                                     nameController.text,
                                     phoneController.text,
-                                    total,
+                                    discountedTotal, // Используем сумму со скидкой
                                   );
                                   if (res) {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            PaymentPage(price: total),
+                                        builder: (context) => PaymentPage(
+                                          price: discountedTotal,
+                                          name: nameController.text,
+                                        ),
                                       ),
                                     );
                                     context.read<CartProvider>().clearCart();

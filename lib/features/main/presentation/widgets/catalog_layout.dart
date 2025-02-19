@@ -7,8 +7,8 @@ import '../../../catalog/presentation/pages/catalog_page.dart';
 import '../../../category/presentation/pages/category_page.dart';
 import '../bloc/catalog_bloc.dart';
 import '../helpres/category_controller.dart';
+import 'all_category_button.dart';
 import 'catalog_screen.dart';
-import 'categories_panel.dart';
 
 class CatalogLayout extends StatefulWidget {
   const CatalogLayout({
@@ -52,7 +52,8 @@ class _CatalogLayoutState extends State<CatalogLayout> {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CategoriesPanel(controller: controller),
+          // CategoriesPanel(controller: controller),
+          const AllCategoryButton(),
           const SizedBox(height: 20),
           CatalogScreen(
             currentCategoryId: controller.value.id,

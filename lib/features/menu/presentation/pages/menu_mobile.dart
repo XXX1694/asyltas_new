@@ -1,6 +1,7 @@
 import 'package:asyltas_app/core/constants.dart';
 import 'package:asyltas_app/features/cart/presentation/pages/cart_page.dart';
 import 'package:asyltas_app/features/catalog/presentation/pages/catalog_page.dart';
+import 'package:asyltas_app/features/delivery/presentation/pages/delivery_page.dart';
 import 'package:asyltas_app/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:asyltas_app/features/main/presentation/pages/home_page.dart';
 import 'package:flutter/cupertino.dart';
@@ -156,6 +157,29 @@ class MenuMobile extends StatelessWidget {
                       },
                       child: const Text(
                         'Избранные',
+                        style: TextStyle(
+                          color: newBlack,
+                          fontSize: 28,
+                          fontFamily: 'Gilroy',
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    CupertinoButton(
+                      padding: const EdgeInsets.all(0),
+                      onPressed: () async {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const DeliveryPage(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'Доставка',
                         style: TextStyle(
                           color: newBlack,
                           fontSize: 28,
